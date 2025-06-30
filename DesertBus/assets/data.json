@@ -1,0 +1,19 @@
+{
+    "Scale": 4,
+    "Size": {
+        "X": 360,
+        "Y": 240
+    },
+    "Rules": [
+        {
+            "From": "BusStop",
+            "To": "Desert",
+            "Condition": "BLUEBERRY_DESERT_BUS_AVAILABLE"
+        },
+        {
+            "From": "Desert",
+            "To": "BusStop",
+            "Condition": "BLUEBERRY_DESERT_BUS_AVAILABLE"
+        }
+    ]
+}

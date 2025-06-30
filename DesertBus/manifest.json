@@ -1,0 +1,11 @@
+{
+    "Name": "Calico Desert Bus",
+    "Author": "blueberry",
+    "Version": "1.0.0",
+    "Description": "I drive",
+    "UniqueID": "blueberry.DesertBus",
+    "EntryDll": "DesertBus.dll",
+    "MinimumApiVersion": "4.0.0",
+    "UpdateKeys": [ "Nexus:10378" ],
+    "Dependencies": []
+}
