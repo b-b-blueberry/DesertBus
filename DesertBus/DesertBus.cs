@@ -51,7 +51,8 @@ public class Game : IMinigame
     public static ICue EngineNoise;
     public static ICue RoadNoise;
 
-    public Texture2D Sprites;
+    public static Texture2D Sprites;
+
     public GameData Data;
     public GameRules Rules;
     public GameState State;
@@ -76,7 +77,8 @@ public class Game : IMinigame
     {
         Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/sprites.png");
 
-        this.Sprites = sprites;
+        Game.Sprites = sprites;
+
         this.Data = data;
         this.Rules = rules;
         this.State = state;
@@ -204,7 +206,7 @@ public class Game : IMinigame
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
-        // odometer
+        // DEBUG: odometer
         {
             int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
             position = new Vector2(this.View.Left + 128, this.View.Bottom - 96);
@@ -215,6 +217,18 @@ public class Game : IMinigame
                 scale: scale,
                 layerDepth: 1,
                 c: Color.White);
+        }
+        // odometer
+        {
+            int initial = 701093;
+            int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
+            position = new Vector2(this.View.Left + 128, this.View.Bottom - 64);
+            Digits.Draw(
+                b: b,
+                position: position + shake,
+                origin: new Vector2(0.5f),
+                value: (uint)(initial + distance),
+                scale: scale);
         }
         // DEBUG: positionometer
         {
@@ -444,5 +458,61 @@ public class Game : IMinigame
     public void receiveEventPoke(int data)
     {
         throw new NotImplementedException();
+    }
+}
+
+public static class Digits
+{
+    private static Texture2D Sprites => Game.Sprites;
+    private static Point Origin = new Point(x: 0, y: 0);
+    private static readonly Rectangle[] Sources = new Rectangle[10];
+    private static Point Size = new Point(x: 5, y: 7);
+    private static Rectangle Slice = new Rectangle(x: 0, y: 0, width: 5, height: 7);
+    private static readonly int Spacing = 0;
+
+    static Digits()
+    {
+        Rectangle slice = new(location: Digits.Origin, size: Digits.Size);
+        const int rows = 1;
+        for (int i = 0; i < Digits.Sources.Length; ++i)
+        {
+            if (i > 0)
+            {
+                if (i % (Digits.Sources.Length / rows) == 0)
+                {
+                    slice.X = Digits.Origin.X;
+                    slice.Y += slice.Height;
+                }
+                else
+                {
+                    slice.X += slice.Width;
+                }
+            }
+            Digits.Sources[i] = new Rectangle(
+                x: slice.X + Digits.Slice.X,
+                y: slice.Y + Digits.Slice.Y,
+                width: Digits.Slice.Width,
+                height: Digits.Slice.Height);
+        }
+    }
+
+    public static Vector2 Draw(SpriteBatch b, Vector2 position, Vector2 origin, uint value, float scale)
+    {
+        foreach (char digit in value.ToString())
+        {
+            b.Draw(
+                texture: Digits.Sprites,
+                position: position,
+                sourceRectangle: Digits.Sources[digit - '0'],
+                color: Color.White,
+                rotation: 0f,
+                origin: origin * Utility.PointToVector2(Digits.Size),
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1f);
+            position.X += (Digits.Slice.Width + Digits.Spacing) * scale;
+        }
+
+        return position;
     }
 }
