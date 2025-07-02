@@ -57,6 +57,9 @@ public class Game : IMinigame
     public GameRules Rules;
     public GameState State;
 
+    public Clock Clock;
+    public Odometer Odometer;
+
     public Rectangle View;
     public float Opacity;
     public Vector2 Shake;
@@ -82,6 +85,9 @@ public class Game : IMinigame
         this.Data = data;
         this.Rules = rules;
         this.State = state;
+
+        this.Clock = new();
+        this.Odometer = new(digits: 6u, start: 601093d);
 
         this.Opacity = 1;
 
@@ -114,7 +120,7 @@ public class Game : IMinigame
     public void changeScreenSize()
     {
         Rectangle viewport = Game1.game1.localMultiplayerWindow;
-        Point size = this.Data.Size.ToPoint();
+        Point size = (this.Data.Size * this.Data.Scale).ToPoint();
         this.View = new(viewport.X + viewport.Width / 2 - size.X / 2, viewport.Y + viewport.Height / 2 - size.Y / 2, size.X, size.Y);
     }
 
@@ -123,10 +129,12 @@ public class Game : IMinigame
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
 
         Rectangle view = Game1.game1.localMultiplayerWindow;
-        float scale = 2;// Game1.pixelZoom;
+        float scale = this.Data.Scale;
         Vector2 position;
         Rectangle source;
         Vector2 shake = this.Shake + new Vector2(0, 3f * (float)Math.Sin(this.State.Distance / 15d));
+        Color colour = Color.White;
+        float alpha = 1f;
 
         // BACKGROUND
 
@@ -145,6 +153,31 @@ public class Game : IMinigame
 
         // FOREGROUND
 
+        // chronometer
+        {
+            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -17) * scale;
+            this.Clock.Draw(b, position + shake, scale, alpha);
+        }
+        // odometer
+        {
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(110, -17) * scale;
+            this.Odometer.Draw(b, position + shake, scale, alpha);
+        }
+        // dashboard
+        {
+            position = this.View.Location.ToVector2();
+            source = new(0, 0, 180, 120);
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: Vector2.Zero,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // driver name
         {
             string text;
@@ -154,102 +187,43 @@ public class Game : IMinigame
 
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
-            textScale = 0.5f;
-            position = new Vector2(this.View.Left + 96, this.View.Top + 24);
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.White, textScale);
+            textScale = scale * 0.25f;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(48, 5) * scale;
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
 
             text = this.State.PlayerName.ToUpper();
             textSize = font.MeasureString(text);
-            textScale = 1f;
-            position += new Vector2(0, 24);
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.White, textScale);
-        }
-        // chronometer
-        {
-            string text = DateTime.Now.ToShortTimeString();
-            if (Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0)
-                text = text.Replace(':', '.');
-            position = new Vector2(this.View.Right - 64, this.View.Bottom - 64);
-            Utility.drawTextWithShadow(
-                b: b,
-                text: text,
-                font: Game1.smallFont,
-                position: position + shake,
-                color: Color.White);
-        }
-        // DEBUG: speedometer
-        {
-            int speed = (int)(this.Speed * (ModEntry.Config.Metric ? 1d : 0.621371d));
-            position = new Vector2(this.View.Left + 64, this.View.Bottom - 96);
-            Utility.drawTinyDigits(
-                toDraw: speed,
-                b: b,
-                position: position + shake,
-                scale: scale,
-                layerDepth: 1,
-                c: Color.White);
+            textScale = scale * 0.5f;
+            position += new Vector2(0, 10) * scale;
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
         }
         // speedometer
         {
             double startRotation = Math.PI; // 6 o'clock
             double addedRotation = this.Speed / 20; // arbitrary speedo scale magic number to place 70kmh at 1~2 o'clock
-            position = new Vector2(this.View.Left + 64, this.View.Bottom - 96);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(64, -16) * scale;
             source = new Rectangle(363, 395, 5, 13);
             b.Draw(
                 texture: Game1.mouseCursors,
                 position: position + shake,
                 sourceRectangle: source,
-                color: Color.White,
+                color: colour,
                 rotation: (float)(startRotation + addedRotation),
                 origin: new Vector2(2.5f, 12),
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
-        // DEBUG: odometer
-        {
-            int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
-            position = new Vector2(this.View.Left + 128, this.View.Bottom - 96);
-            Utility.drawTinyDigits(
-                toDraw: distance,
-                b: b,
-                position: position + shake,
-                scale: scale,
-                layerDepth: 1,
-                c: Color.White);
-        }
-        // odometer
-        {
-            int initial = 701093;
-            int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
-            position = new Vector2(this.View.Left + 128, this.View.Bottom - 64);
-            Digits.Draw(
-                b: b,
-                position: position + shake,
-                origin: new Vector2(0.5f),
-                value: (uint)(initial + distance),
-                scale: scale);
-        }
-        // DEBUG: positionometer
-        {
-            position = new Vector2(this.View.Left + 256, this.View.Bottom - 96);
-            Utility.drawTextWithShadow(
-                b: b,
-                text: ((int)this.State.Position).ToString(),
-                font: Game1.smallFont,
-                position: position + shake,
-                color: Color.White);
-        }
         // wheel
         {
             double wheelRotation = this.WheelRotation;
-            position = new Vector2(this.View.Left + this.View.Width / 4, this.View.Bottom - 16);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(36, -8) * scale;
             source = new Rectangle(228, 465, 37, 37);
             b.Draw(
                 texture: Game1.mouseCursors,
                 position: position + shake,
                 sourceRectangle: source,
-                color: Color.White,
+                color: colour,
                 rotation: (float)(wheelRotation),
                 origin: source.Size.ToVector2() / 2,
                 scale: scale,
@@ -260,19 +234,85 @@ public class Game : IMinigame
         {
             int numFrames = 8;
             int frame = (int)Math.Floor((Math.PI + 2d * Math.Sin(this.State.Distance / 10)) % numFrames);
-            position = new Vector2(this.View.Left + this.View.Width / 2, this.View.Top + 64);
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(116, 28) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
                 texture: Game1.mouseCursors,
                 position: position + shake,
-                color: Color.White,
+                color: colour,
                 sourceRectangle: source,
                 rotation: 0,
                 origin: Vector2.Zero,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
+        }
+        // DEBUG: speedometer
+        {
+            int speed = (int)(this.Speed * (ModEntry.Config.Metric ? 1d : 0.621371d));
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(70, -12) * scale;
+            Utility.drawTinyDigits(
+                toDraw: speed,
+                b: b,
+                position: position + shake,
+                scale: scale,
+                layerDepth: 1,
+                c: Color.White);
+        }
+        // DEBUG: odometer
+        {
+            int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(106, -12) * scale;
+            Utility.drawTinyDigits(
+                toDraw: distance,
+                b: b,
+                position: position + shake,
+                scale: scale,
+                layerDepth: 1,
+                c: Color.White);
+        }
+        // DEBUG: positionometer
+        {
+            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-16, -16) * scale;
+            Utility.drawTextWithShadow(
+                b: b,
+                text: ((int)this.State.Position).ToString(),
+                font: Game1.smallFont,
+                position: position + shake,
+                color: Color.White,
+                shadowIntensity: 0);
+        }
+        // DEBUG: wheel rotation
+        {
+            string text;
+            Vector2 textSize;
+            float textScale = scale * 0.25f;
+            SpriteFont font = Game1.smallFont;
+
+            text = $"{this.WheelRotation:00}";
+            textSize = font.MeasureString(text);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(16, -64) * scale - new Vector2(textSize.X, 0) * textScale;
+            Utility.drawTextWithShadow(
+                b: b,
+                text: text,
+                font: Game1.smallFont,
+                position: position + shake,
+                color: Color.Black,
+                scale: textScale,
+                shadowIntensity: 0);
+
+            text = $"{this.WheelSpeed:0.00}";
+            textSize = font.MeasureString(text);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(32, -64) * scale - new Vector2(textSize.X, 0) * textScale;
+            Utility.drawTextWithShadow(
+                b: b,
+                text: text,
+                font: Game1.smallFont,
+                position: position + shake,
+                color: Color.Black,
+                scale: textScale,
+                shadowIntensity: 0);
         }
 
         // FADE
@@ -337,6 +377,10 @@ public class Game : IMinigame
         else
         {
             this.Shake = Vector2.Zero;
+        }
+        // odometer
+        {
+            this.Odometer.Update(ms, this.State.Distance);
         }
         // sounds
         if (speed <= 0 && this.Speed > 0 && (Game.StartNoise is null || !Game.StartNoise.IsPlaying))
@@ -461,58 +505,130 @@ public class Game : IMinigame
     }
 }
 
+public class Odometer
+{
+    public float[] Offsets;
+    public double Value;
+    public double DisplayValue;
+    public double InitialDisplayValue;
+
+    public Odometer(uint digits, double start)
+    {
+        // values
+        this.InitialDisplayValue = start;
+        this.Offsets = new float[digits];
+        string str = start.ToString();
+        for (int i = str.Length - 1; i >= 0; --i)
+            this.Offsets[i] = new();
+        this.Update(0, 0);
+    }
+
+    public void Update(double ms, double value)
+    {
+        this.Value = value;
+        this.DisplayValue = this.InitialDisplayValue + value / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d);
+
+        // adjust digit offsets
+        string digits = ((uint)this.DisplayValue).ToString();
+        this.Offsets[digits.Length - 1] = (float)(this.DisplayValue - (int)this.DisplayValue) * -Digits.Slice.Height;
+        for (int i = digits.Length - 2; i >= 0; --i)
+        {
+            uint next = ((uint)digits[i + 1] - '0');
+            this.Offsets[i] = next / 10f * -Digits.Slice.Height;
+        }
+    }
+
+    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha)
+    {
+        // DEBUG: backboard
+        {
+            Vector2 drawSize = new Vector2(Digits.Slice.Width * this.Offsets.Length, Digits.Slice.Height) * scale;
+            Vector2 drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
+            Rectangle drawArea = new Rectangle(drawPosition.ToPoint(), drawSize.ToPoint());
+            Utility.DrawSquare(b, drawArea, 0, null, Color.Black);
+
+            drawSize = Digits.Slice.Size.ToVector2() * scale;
+            drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
+            drawArea = new Rectangle(drawPosition.ToPoint(), drawSize.ToPoint());
+            Utility.DrawSquare(b, drawArea, 0, null, Color.White);
+        }
+
+        // digits
+        string digits = ((uint)this.DisplayValue).ToString();
+        for (int i = digits.Length - 1; i >= 0; --i)
+        {
+            uint digit = (uint)digits[i] - '0';
+            uint below = (uint)((digit + 1) % (Digits.Sources.Length));
+            float offset = (this.Offsets[i]) * scale;
+            Color colour = (i == digits.Length - 1 ? Color.Black : Color.White) * alpha;
+
+            Digits.draw(b, digit, position + new Vector2(0, offset), scale, colour);
+            Digits.draw(b, below, position + new Vector2(0, offset + Digits.Slice.Height * scale), scale, colour);
+            position -= new Vector2(Digits.Slice.Width * scale, 0);
+        }
+    }
+}
+
+public class Clock
+{
+    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha)
+    {
+        string text = $"{DateTime.Now.Hour:00} {DateTime.Now.Minute:00}";
+        Color colour = Color.SpringGreen * alpha;
+
+        // DEBUG: backboard
+        {
+            Vector2 drawSize = new Vector2(Digits.Slice.Width * text.Length, Digits.Slice.Height) * scale;
+            Vector2 drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
+            Rectangle drawArea = new Rectangle(drawPosition.ToPoint(), drawSize.ToPoint());
+            Utility.DrawSquare(b, drawArea, 0, null, Color.Black);
+        }
+
+        //if (Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0)
+        //    return;
+
+        // digits
+        for (int i = text.Length - 1; i >= 0; --i)
+        {
+            uint digit = (uint)text[i] - '0';
+            if (digit < Digits.Sources.Length)
+                Digits.draw(b, digit, position, scale, colour);
+            position -= new Vector2(Digits.Slice.Width * scale, 0);
+        }
+    }
+}
+
 public static class Digits
 {
-    private static Texture2D Sprites => Game.Sprites;
-    private static Point Origin = new Point(x: 0, y: 0);
-    private static readonly Rectangle[] Sources = new Rectangle[10];
-    private static Point Size = new Point(x: 5, y: 7);
-    private static Rectangle Slice = new Rectangle(x: 0, y: 0, width: 5, height: 7);
-    private static readonly int Spacing = 0;
+    public static Texture2D Sprites => Game.Sprites;
+    public static readonly Rectangle Slice = new Rectangle(x: 0, y: 120, width: 5, height: 7);
+    public static readonly Rectangle[] Sources = new Rectangle[10];
 
     static Digits()
     {
-        Rectangle slice = new(location: Digits.Origin, size: Digits.Size);
-        const int rows = 1;
+        Rectangle slice = new(location: Point.Zero, size: Digits.Slice.Size);
         for (int i = 0; i < Digits.Sources.Length; ++i)
         {
-            if (i > 0)
-            {
-                if (i % (Digits.Sources.Length / rows) == 0)
-                {
-                    slice.X = Digits.Origin.X;
-                    slice.Y += slice.Height;
-                }
-                else
-                {
-                    slice.X += slice.Width;
-                }
-            }
             Digits.Sources[i] = new Rectangle(
                 x: slice.X + Digits.Slice.X,
                 y: slice.Y + Digits.Slice.Y,
                 width: Digits.Slice.Width,
                 height: Digits.Slice.Height);
+            slice.X += slice.Width;
         }
     }
 
-    public static Vector2 Draw(SpriteBatch b, Vector2 position, Vector2 origin, uint value, float scale)
+    public static void draw(SpriteBatch b, uint digit, Vector2 position, float scale, Color colour)
     {
-        foreach (char digit in value.ToString())
-        {
-            b.Draw(
-                texture: Digits.Sprites,
-                position: position,
-                sourceRectangle: Digits.Sources[digit - '0'],
-                color: Color.White,
-                rotation: 0f,
-                origin: origin * Utility.PointToVector2(Digits.Size),
-                scale: scale,
-                effects: SpriteEffects.None,
-                layerDepth: 1f);
-            position.X += (Digits.Slice.Width + Digits.Spacing) * scale;
-        }
-
-        return position;
+        b.Draw(
+            texture: Digits.Sprites,
+            position: position,
+            sourceRectangle: Digits.Sources[digit],
+            color: colour,
+            rotation: 0,
+            origin: Utility.PointToVector2(Digits.Slice.Size),
+            scale: scale,
+            effects: SpriteEffects.None,
+            layerDepth: 1);
     }
 }
