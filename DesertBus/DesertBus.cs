@@ -17,8 +17,10 @@ public class GameData
 
 public class GameRules
 {
+    // location
     public string From = null;
     public string To = null;
+    // bus model
     public int MaxSpeed = 70;
     public double Acceleration = 1.5d;
     public double Deceleration = -0.666d;
@@ -29,10 +31,13 @@ public class GameRules
     public double SteeringDecay = -0.5d;
     public double SteeringRotations = 3d;
     public double PositionDrift = 5d;
+    // road conditions
     public int Width = 100;
-    public double Distance = 580000d;
+    public int Distance = 580000;
+    // lose conditions
     public int FailTime = 5000;
     public double FailTimeDecay = -0.25d;
+    // rule conditions
     public string Condition = null;
 }
 
@@ -234,7 +239,7 @@ public class Game : IMinigame
         // scent tree
         {
             int numFrames = 8;
-            int frame = (int)Math.Floor((Math.PI + 2d * Math.Sin(this.State.Distance / 10)) % numFrames);
+            int frame = (int)Math.Floor((Math.PI + 2d * Math.Sin(this.State.Distance / 10d)) % numFrames);
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(116, 28) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
@@ -414,7 +419,7 @@ public class Game : IMinigame
             }
         }
         // win condition
-        if (this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance)
+        if (this.Rules.Distance > 0 && (int)this.State.Distance >= this.Rules.Distance)
         {
             // well done!
             this.Quit = true;
