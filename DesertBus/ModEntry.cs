@@ -3,17 +3,19 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Delegates;
+using StardewValley.Locations;
 
 namespace DesertBus;
+
+public class ModConfig
+{
+    public bool Intro { get; set; } = true;
+    public bool Metric { get; set; } = true;
+}
 
 public class ModState
 {
     public Game Game { get; set; }
-}
-
-public class ModConfig
-{
-    public bool Metric { get; set; } = true;
 }
 
 public class ModEntry : Mod
@@ -26,6 +28,7 @@ public class ModEntry : Mod
     public static ModConfig Config { get; private set; }
     public static ITranslationHelper I18n => ModEntry.Instance.Helper.Translation;
     public static PerScreen<ModState> State { get; private set; }
+    public static NPC Pam => Game1.getCharacterFromName("Pam");
 
     public override void Entry(IModHelper helper)
     {
@@ -35,9 +38,9 @@ public class ModEntry : Mod
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
         helper.Events.Player.Warped += this.OnWarped;
 
-        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => this.TryStartGame(from: null, to: null, test: true));
+        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, test: true));
 
-        GameStateQuery.Register(ModEntry.GSQ_ID, (string[] query, GameStateQueryContext context) => this.CanDriveTheBus(context.Player, context.Location));
+        GameStateQuery.Register(ModEntry.GSQ_ID, (string[] query, GameStateQueryContext context) => ModEntry.CanDriveTheBus(context.Player, context.Location));
     }
 
     public void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -52,35 +55,60 @@ public class ModEntry : Mod
 
         if (e.OldLocation != e.NewLocation)
         {
-            this.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name);
+            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name);
         }
     }
 
-    public bool CanDriveTheBus(Farmer player, GameLocation location)
+    public static bool IsPamDriving(GameLocation location)
     {
-        bool isBusReady = player.mailReceived.Contains("ccVault");
-        bool isPamDriving = Game1.getCharacterFromName("Pam") is NPC pam
-            && location is not null
+        NPC pam = ModEntry.Pam;
+        bool isBusStop = location is BusStop
             && location.characters.Contains(pam)
-            && pam.TilePoint.X == 21 && pam.TilePoint.Y == 10;
-        return !isPamDriving && Game1.netWorldState.Value.canDriveYourselfToday.Value;
+            && pam.TilePoint.X == 21
+            && pam.TilePoint.Y == 10;
+        bool isDesert = location is Desert
+            && !Desert.warpedToDesert;
+        return pam is not null && (isBusStop || isDesert);
     }
 
-    public void TryStartGame(string from, string to, bool test = false)
+    public static bool IsPlayerDriving(GameLocation location)
     {
-        GameStateQueryContext context = new(Game1.getLocationFromName(from) ?? Game1.currentLocation, Game1.player, null, null, Game1.random);
+        return Game1.netWorldState.Value.canDriveYourselfToday.Value || (location is Desert && Desert.warpedToDesert);
+    }
+
+    public static bool CanDriveTheBus(Farmer player, GameLocation location)
+    {
+        bool isBusReady = player.mailReceived.Contains("ccVault");
+        bool isPamDriving = ModEntry.IsPamDriving(location);
+        bool isPlayerDriving = ModEntry.IsPlayerDriving(location);
+        return isBusReady && (isPamDriving || isPlayerDriving);
+    }
+
+    public static void TryStartGame(string from, string to, bool test = false)
+    {
+        GameLocation location = Game1.getLocationFromName(from) ?? Game1.currentLocation;
+        Farmer player = Game1.player;
+        NPC pam = ModEntry.Pam;
+
+        GameStateQueryContext context = new(location, player, null, null, Game1.random);
         GameData data = ModEntry.Instance.Helper.ModContent.Load<GameData>("assets/data.json");
         GameRules rules = test ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
 
+        bool isPamDriving = ModEntry.IsPamDriving(location);
+        bool isPlayerDriving = ModEntry.IsPlayerDriving(location);
+
+        long id = isPlayerDriving && !isPamDriving ? player.UniqueMultiplayerID : -1;
+        string name = isPamDriving ? pam.displayName : player.Name;
+
         if (rules is not null)
         {
-            GameState state = rules is null ? null : new GameState()
+            GameState state = new GameState()
             {
-                PlayerID = Game1.player.UniqueMultiplayerID,
-                PlayerName = Game1.player.Name,
+                PlayerID = id,
+                PlayerName = name,
                 From = rules.From,
                 To = rules.To,
-                Position = rules.Width / 4
+                Position = -rules.Width / 4
             };
             Game game = new Game(data, rules, state);
             Game1.currentMinigame = game;
