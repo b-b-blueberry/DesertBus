@@ -152,6 +152,7 @@ public class Game : IMinigame
         // sand
         Utility.DrawSquare(b, new(this.View.Left, this.View.Top + this.View.Height / 3, this.View.Width, this.View.Height / 3 * 2), 0, null, Color.Orange);
         // DEBUG: road
+        if (ModEntry.Debug)
         {
             int median = -(int)this.State.Position;
             Utility.drawLineWithScreenCoordinates(this.View.Center.X + median, this.View.Top, this.View.Center.X + median, this.View.Bottom, b, Color.Black, 1, 1);
@@ -298,6 +299,7 @@ public class Game : IMinigame
                 layerDepth: 1);
         }
         // DEBUG: speedometer
+        if (ModEntry.Debug)
         {
             int speed = (int)(this.Speed * (ModEntry.Config.Metric ? 1d : 0.621371d));
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(70, -12) * scale;
@@ -310,6 +312,7 @@ public class Game : IMinigame
                 c: Color.White);
         }
         // DEBUG: odometer
+        if (ModEntry.Debug)
         {
             int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(106, -12) * scale;
@@ -322,6 +325,7 @@ public class Game : IMinigame
                 c: Color.White);
         }
         // DEBUG: positionometer
+        if (ModEntry.Debug)
         {
             position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-16, -16) * scale;
             Utility.drawTextWithShadow(
@@ -333,6 +337,7 @@ public class Game : IMinigame
                 shadowIntensity: 0);
         }
         // DEBUG: wheel rotation
+        if (ModEntry.Debug)
         {
             string text;
             Vector2 textSize;

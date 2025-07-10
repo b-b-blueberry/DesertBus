@@ -30,6 +30,8 @@ public class ModEntry : Mod
     public static PerScreen<ModState> State { get; private set; }
     public static NPC Pam => Game1.getCharacterFromName("Pam");
 
+    public const bool Debug = false;
+
     public override void Entry(IModHelper helper)
     {
         ModEntry.Instance = this;
