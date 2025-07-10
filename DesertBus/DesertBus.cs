@@ -278,8 +278,8 @@ public class Game : IMinigame
         }
         // scent tree
         {
-            int numFrames = 8;
-            int frame = (int)Math.Floor((Math.PI + 2d * Math.Sin(this.State.Distance / 10d)) % numFrames);
+            const int numFrames = 8;
+            int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 33d)) % numFrames) / 2;
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(116, 28) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
