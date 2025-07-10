@@ -108,7 +108,7 @@ public class ModEntry : Mod
                 PlayerName = name,
                 From = rules.From,
                 To = rules.To,
-                Position = -rules.Width / 4
+                Position = rules.Width / 4
             };
             Game game = new Game(data, rules, state);
             Game1.currentMinigame = game;
