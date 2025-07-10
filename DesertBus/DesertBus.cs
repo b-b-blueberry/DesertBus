@@ -100,6 +100,8 @@ public class Game : IMinigame
         this.Odometer = new(digits: 6u, start: 601093d);
 
         this.Decor = new(size: 32, create: () => new Decor());
+        for (int i = 0; i < Game1.random.Next(3); ++i)
+            this.addDecor(randomY: true);
 
         this.Opacity = 1;
 
@@ -134,6 +136,27 @@ public class Game : IMinigame
         Rectangle viewport = Game1.game1.localMultiplayerWindow;
         Point size = (this.Data.Size * this.Data.Scale).ToPoint();
         this.View = new(viewport.X + viewport.Width / 2 - size.X / 2, viewport.Y + viewport.Height / 2 - size.Y / 2, size.X, size.Y);
+    }
+
+    public void addDecor(bool randomY = false)
+    {
+        Decor decor = this.Decor.Get();
+        decor.Position = Game1.random.NextDouble() - 0.5d;
+        decor.Distance = randomY ? Game1.random.NextDouble() * 0.25d : 0d;
+        if (0d < decor.Position && decor.Position < 0.05d)
+            // sign
+            decor.Sprites = new Dictionary<float, Rectangle>{
+                {0.3f, new(323, 477, 9, 19)},
+                {0.1f, new(362, 395, 7, 13)},
+                {0f, new(375, 404, 4, 4)},
+            };
+        else
+            // bush
+            decor.Sprites = new Dictionary<float, Rectangle>{
+                {0.3f, new(71, 1931, 21, 21)},
+                {0.1f, new(137, 412, 10, 11)},
+                {0f, new(433, 451, 3, 3)},
+            };
     }
 
     public void draw(SpriteBatch b)
@@ -501,13 +524,7 @@ public class Game : IMinigame
         {
             if (this.Speed > 0 && ticks % 60 == 0 && Game1.random.NextDouble() * 2d * this.Rules.MaxSpeed * 0.9d < this.Speed)
             {
-                Decor decor = this.Decor.Get();
-                decor.Position = Game1.random.NextDouble() - 0.5d;
-                decor.Sprites = new Dictionary<float, Rectangle>{
-                    {0.3f, new(71, 1931, 21, 21)},
-                    {0.1f, new(137, 412, 10, 11)},
-                    {0f, new(433, 451, 3, 3)},
-                };
+                this.addDecor();
             }
             foreach (Decor decor in this.Decor)
             {
