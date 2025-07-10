@@ -67,6 +67,8 @@ public class Game : IMinigame
     public Clock Clock;
     public Odometer Odometer;
 
+    public Pool<Decor> Decor;
+
     public Rectangle View;
     public float Opacity;
     public Vector2 Shake;
@@ -96,6 +98,8 @@ public class Game : IMinigame
 
         this.Clock = new();
         this.Odometer = new(digits: 6u, start: 601093d);
+
+        this.Decor = new(size: 16, create: () => new Decor());
 
         this.Opacity = 1;
 
@@ -144,6 +148,8 @@ public class Game : IMinigame
         Color colour = Color.White;
         float alpha = 1f;
 
+        float horizon = 0.333f;
+        float median = (float)-this.State.Position / this.View.Width * 5f;
         // BACKGROUND
 
         // sky
@@ -154,11 +160,10 @@ public class Game : IMinigame
         // DEBUG: road
         if (ModEntry.Debug)
         {
-            int median = -(int)this.State.Position;
-            Utility.drawLineWithScreenCoordinates(this.View.Center.X + median, this.View.Top, this.View.Center.X + median, this.View.Bottom, b, Color.Black, 1, 1);
+            int median1 = -(int)this.State.Position;
+            Utility.drawLineWithScreenCoordinates(this.View.Center.X + median1, this.View.Top, this.View.Center.X + median1, this.View.Bottom, b, Color.Black, 1, 1);
         }
-        // decorations
-        
+
         b.End();
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
         
@@ -176,12 +181,10 @@ public class Game : IMinigame
 
             // fill colour
             Color c = new(95, 90, 95);
-            float median = (float)-this.State.Position / this.View.Width * 5f;
-            float horizon = 0.666f;
             float width = this.Rules.Width / 60f;
             var vertices = new Vector3[] {
                 viewToVertex(new(-0.1f + 0 + median, 0)),
-                viewToVertex(new(-0.25f + (width * 0.4f), horizon)),
+                viewToVertex(new(-0.25f + (width * 0.4f), 1f - horizon)),
                 viewToVertex(new(-0.1f + width + median, 0)),
             };
             var triangles = vertices.Select(v => new VertexPositionColor(v, c)).ToArray();
@@ -192,6 +195,24 @@ public class Game : IMinigame
                     pass.Apply();
                     Game1.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangles, 0, triangles.Length / 3);
                 }
+            }
+        }
+
+        b.End();
+        b.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
+
+        // decor
+        {
+            position = new Vector2(this.View.Center.X, this.View.Top + this.View.Height * horizon);
+            Vector2 offset;
+            float ratio;
+            foreach (Decor decor in this.Decor)
+            {
+                ratio = (float)decor.Distance;
+                offset = new Vector2(
+                    x: (ratio * 3) * (float)(decor.Position) * this.View.Width,
+                    y: ratio * (this.View.Height - this.View.Height * horizon));
+                decor.Draw(b, position + offset, scale);
             }
         }
 
@@ -463,6 +484,23 @@ public class Game : IMinigame
             Game.EngineNoise.SetVariable("Volume", (int)volume);
             Game.EngineNoise.SetVariable("Frequency", (int)volume);
         }
+        // decor
+        {
+            if (ticks % 30 == 0 && Game1.random.NextDouble() * this.Rules.MaxSpeed * 0.9d < this.Speed)
+            {
+                Decor decor = this.Decor.Get();
+                decor.Position = Game1.random.NextDouble() - 0.5d;
+                decor.Sprites = new Dictionary<float, Rectangle>{
+                    {0.3f, new(71, 1931, 21, 21)},
+                    {0.1f, new(137, 412, 10, 11)},
+                    {0f, new(433, 451, 3, 3)},
+                };
+            }
+            foreach (Decor decor in this.Decor)
+            {
+                decor.Update(ms, this.Speed);
+            }
+        }
         // lose condition
         {
             double change = isOffRoad ? ms : this.Rules.FailTimeDecay * 1000 / ms;
@@ -695,5 +733,57 @@ public static class Digits
             scale: scale,
             effects: SpriteEffects.None,
             layerDepth: 1);
+    }
+}
+
+public class Decor : IPooled
+{
+    public Dictionary<float, Rectangle> Sprites;
+    public double Distance;
+    public double Position;
+    public bool IsOffscreen;
+
+    public bool IsDisposed => this.IsOffscreen;
+
+    public void Reset()
+    {
+        this.Distance = 0;
+        this.Position = 0;
+        this.IsOffscreen = false;
+    }
+
+    public Decor()
+    {
+        //(°o,88,o° )/\\\\ aaah a spider
+    }
+
+    public void Update(double ms, double speed)
+    {
+        if (this.IsOffscreen)
+            return;
+
+        if (this.Distance >= 1)
+            this.IsOffscreen = true;
+
+        this.Distance += speed / ms / 1000;
+    }
+
+    public void Draw(SpriteBatch b, Vector2 position, float scale)
+    {
+        if (this.IsOffscreen)
+            return;
+
+        Rectangle source = this.Sprites.FirstOrDefault(pair => pair.Key < this.Distance).Value;
+
+        b.Draw(
+            texture: Game1.mouseCursors,
+            position: position,
+            sourceRectangle: source,
+            color: Color.White,
+            rotation: 0,
+            origin: source.Size.ToVector2() / 2,
+            scale: scale,
+            effects: this.Position < 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+            layerDepth: (float)this.Distance);
     }
 }
