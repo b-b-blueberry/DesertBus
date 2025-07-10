@@ -58,6 +58,7 @@ public class Game : IMinigame
     public static ICue RoadNoise;
 
     public static Texture2D Sprites;
+    public BasicEffect basicEffect;
 
     public GameData Data;
     public GameRules Rules;
@@ -87,6 +88,7 @@ public class Game : IMinigame
         Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/sprites.png");
 
         Game.Sprites = sprites;
+        this.basicEffect = new(Game1.graphics.GraphicsDevice);
 
         this.Data = data;
         this.Rules = rules;
@@ -153,9 +155,47 @@ public class Game : IMinigame
         {
             int median = -(int)this.State.Position;
             Utility.drawLineWithScreenCoordinates(this.View.Center.X + median, this.View.Top, this.View.Center.X + median, this.View.Bottom, b, Color.Black, 1, 1);
-            //Game1.graphics.GraphicsDevice.DrawUserIndexedPrimitives<>(PrimitiveType.TriangleList, [], 0, 3, [], 0, 1);
         }
         // decorations
+        
+        b.End();
+        b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
+        
+        // road
+        {
+            //Vector2 size = this.View.Size.ToVector2();
+            Vector2 ratio = this.View.Size.ToVector2() / view.Size.ToVector2();
+            Vector3 viewToVertex(Vector2 position)
+            {
+                return new Vector3((new Vector2(position.X, position.Y) * 2f - Vector2.One) * ratio, 0.1f);
+            }
+
+            this.basicEffect = new(Game1.graphics.GraphicsDevice);
+            this.basicEffect.VertexColorEnabled = true;
+
+            // fill colour
+            Color c = new(95, 90, 95);
+            float median = (float)-this.State.Position / this.View.Width * 5f;
+            float horizon = 0.666f;
+            float width = this.Rules.Width / 60f;
+            var vertices = new Vector3[] {
+                viewToVertex(new(-0.1f + 0 + median, 0)),
+                viewToVertex(new(-0.25f + (width * 0.4f), horizon)),
+                viewToVertex(new(-0.1f + width + median, 0)),
+            };
+            var triangles = vertices.Select(v => new VertexPositionColor(v, c)).ToArray();
+            if (triangles.Length % 3 == 0)
+            {
+                foreach (EffectPass pass in this.basicEffect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    Game1.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangles, 0, triangles.Length / 3);
+                }
+            }
+        }
+
+        b.End();
+        b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
 
         // FOREGROUND
 
