@@ -99,7 +99,7 @@ public class Game : IMinigame
         this.Clock = new();
         this.Odometer = new(digits: 6u, start: 601093d);
 
-        this.Decor = new(size: 16, create: () => new Decor());
+        this.Decor = new(size: 32, create: () => new Decor());
 
         this.Opacity = 1;
 
@@ -149,7 +149,20 @@ public class Game : IMinigame
         float alpha = 1f;
 
         float horizon = 0.333f;
-        float median = (float)-this.State.Position / this.View.Width * 5f;
+        float median = (float)-this.State.Position / 100;
+
+        // transform coordinates in (-1~1) space to increase x value range as y approaches 1
+        double perspective(Vector2 position, float ratio)
+        {
+            // vanishing point
+            Vector2 far = new(-0.1f + position.X / 2, horizon);
+
+            // near point
+            Vector2 near = new(-0.1f + position.X / position.X * Math.Sign(position.X) * 1.75f + median, position.Y - horizon);
+
+            return Vector2.Lerp(far, near, ratio).X;
+        }
+
         // BACKGROUND
 
         // sky
@@ -210,7 +223,7 @@ public class Game : IMinigame
             {
                 ratio = (float)decor.Distance;
                 offset = new Vector2(
-                    x: (ratio * 3) * (float)(decor.Position) * this.View.Width,
+                    x: (float)perspective(new Vector2((float)decor.Position, (float)decor.Distance), ratio) * this.View.Width,
                     y: ratio * (this.View.Height - this.View.Height * horizon));
                 decor.Draw(b, position + offset, scale);
             }
@@ -486,7 +499,7 @@ public class Game : IMinigame
         }
         // decor
         {
-            if (ticks % 30 == 0 && Game1.random.NextDouble() * this.Rules.MaxSpeed * 0.9d < this.Speed)
+            if (this.Speed > 0 && ticks % 60 == 0 && Game1.random.NextDouble() * 2d * this.Rules.MaxSpeed * 0.9d < this.Speed)
             {
                 Decor decor = this.Decor.Get();
                 decor.Position = Game1.random.NextDouble() - 0.5d;
@@ -765,7 +778,7 @@ public class Decor : IPooled
         if (this.Distance >= 1)
             this.IsOffscreen = true;
 
-        this.Distance += speed / ms / 1000;
+        this.Distance += speed / ms / 2500 * (1 - Math.Abs(this.Position));
     }
 
     public void Draw(SpriteBatch b, Vector2 position, float scale)
