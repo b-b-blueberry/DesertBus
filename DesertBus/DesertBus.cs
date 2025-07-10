@@ -230,6 +230,7 @@ public class Game : IMinigame
             Vector2 textSize;
             float textScale;
             SpriteFont font = Game1.smallFont;
+            const int length = 9;
 
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
@@ -238,6 +239,8 @@ public class Game : IMinigame
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
 
             text = this.State.PlayerName.ToUpper();
+            if (text.Length > length)
+                text = $"{text.Take(length)}.";
             textSize = font.MeasureString(text);
             textScale = scale * 0.5f;
             position += new Vector2(0, 10) * scale;
