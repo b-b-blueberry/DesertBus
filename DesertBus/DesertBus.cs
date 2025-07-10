@@ -25,8 +25,8 @@ public class GameRules
     public double Acceleration = 1.5d;
     public double Deceleration = -0.666d;
     public double Braking = -10.0d;
-    public double SteeringLimit = 0.5d;
-    public double SteeringToWheel = 0.35d;
+    public double SteeringLimit = 1.0d;
+    public double SteeringToWheel = 0.5d;
     public double SteeringToGround = 0.0075d;
     public double SteeringDecay = -0.5d;
     public double SteeringRotations = 3d;
@@ -360,6 +360,7 @@ public class Game : IMinigame
         }
         // steering
         {
+            // player steering eases in and out to be cool & annoying
             double rotationBounds = Math.PI * this.Rules.SteeringRotations;
             int steeringDirection = Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveRightButton)
                 ? 1 : Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveLeftButton)
@@ -372,10 +373,16 @@ public class Game : IMinigame
 
             this.WheelSpeed = Math.Clamp(this.WheelSpeed + rotation / ms, -this.Rules.SteeringLimit, this.Rules.SteeringLimit);
             this.WheelRotation = Math.Clamp(this.WheelRotation + this.WheelSpeed / ms, -rotationBounds, rotationBounds);
+            // steering gradually returns to zero
+            // there are better ways of doing this. i did not do them
+            rotation = (Math.Abs(this.WheelRotation) < Math.Abs(this.Rules.SteeringDecay))
+                ? -this.WheelRotation // zero-out rotation when rotation is nearly zero
+                : this.Rules.SteeringDecay * (this.WheelRotation > 0 ? 1 : -1); // decay rotation in opposite direction
+            this.WheelRotation += rotation / ms * 0.5d;
 
             // complete nonsense
             double fuckYou = Game1.random.NextDouble() * this.Rules.PositionDrift / ms * this.Speed / this.Rules.MaxSpeed;
-            this.State.Position = Math.Clamp(this.State.Position + fuckYou + this.WheelRotation * this.Rules.SteeringToGround * this.Speed, -this.Rules.Width, this.Rules.Width);
+            this.State.Position = Math.Clamp(this.State.Position + fuckYou + this.WheelRotation * this.Rules.SteeringToGround * this.Speed, -this.Rules.Width * 3, this.Rules.Width * 3);
         }
         // shake
         if (isOffRoad && this.Speed > 0)
