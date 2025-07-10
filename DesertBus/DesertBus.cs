@@ -792,10 +792,10 @@ public class Decor : IPooled
         if (this.IsOffscreen)
             return;
 
-        if (this.Distance >= 1)
+        if (this.Distance >= 0.5d)
             this.IsOffscreen = true;
 
-        this.Distance += speed / ms / 2500 * (1 - Math.Abs(this.Position));
+        this.Distance += speed / ms / 2500d * (1 - Math.Abs(this.Position));
     }
 
     public void Draw(SpriteBatch b, Vector2 position, float scale)
