@@ -196,9 +196,9 @@ public class Game : IMinigame
             Color c = new(95, 90, 95);
             float width = this.Rules.Width / 60f;
             var vertices = new Vector3[] {
-                viewToVertex(new(-0.1f + 0 + median, 0)),
+                viewToVertex(new(-0.25f + 0 + median, 0)),
                 viewToVertex(new(-0.25f + (width * 0.4f), 1f - horizon)),
-                viewToVertex(new(-0.1f + width + median, 0)),
+                viewToVertex(new(-0.25f + width + median, 0)),
             };
             var triangles = vertices.Select(v => new VertexPositionColor(v, c)).ToArray();
             if (triangles.Length % 3 == 0)
