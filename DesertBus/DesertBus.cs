@@ -804,7 +804,15 @@ public class Game : IMinigame
         if (this.Quit && this.Opacity <= 0)
         {
             this.unload();
+
+            // now perish
+            if (this.Failure)
+            {
+                Farmer.passOutFromTired(Game1.player);
+            }
+
             Game1.globalFadeToClear();
+
             return true;
         }
         return false;
