@@ -82,13 +82,15 @@ public class Game : IMinigame
     public double WheelSpeed;
     public double WheelRotation;
 
-    //public double StartTimer;
     //public double DoorTimer;
     public double FailTimer;
-    public double EndTimer;
 
+    public int Fade;
     public bool AllowInput;
     public bool Quit;
+
+    public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
+    public bool Failure => this.Speed <= 0 && this.FailTimer >= this.Rules.FailTime;
 
     public Game(GameData data, GameRules rules, GameState state)
     {
@@ -116,7 +118,7 @@ public class Game : IMinigame
             {0f, new(323, 477, 9, 19)},
         };
 
-        this.Opacity = 1;
+        this.Opacity = 0;
         this.Shake = Vector2.Zero;
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
 
@@ -125,8 +127,8 @@ public class Game : IMinigame
         this.WheelRotation = 0;
 
         this.FailTimer = 0;
-        this.EndTimer = 0;
 
+        this.Fade = 0;
         this.AllowInput = true;
         this.Quit = false;
 
@@ -534,7 +536,7 @@ public class Game : IMinigame
                 force += this.Rules.Acceleration * (1 - this.FailTimer / this.Rules.FailTime);
 
             this.Speed = Math.Clamp(this.Speed + force / ms, 0, this.Rules.MaxSpeed);
-            this.State.Distance = Math.Clamp(this.State.Distance + this.Speed / 60d, 0, this.Rules.Distance);
+            this.State.Distance = Math.Clamp(this.State.Distance + this.Speed / 60d, 0, this.Rules.Distance + this.Rules.MaxSpeed * 10); // a little extra for fade-out
         }
         // steering
         {
@@ -623,18 +625,25 @@ public class Game : IMinigame
                 //this.Quit = true;
             }
         }
-        // win condition
-        if (this.Rules.Distance > 0 && (int)this.State.Distance >= this.Rules.Distance)
+        // fade alpha
+        {
+            this.Fade = 1;
+            if (this.Quit)
+                this.Fade = -1;
+            this.Opacity = (float)Math.Clamp(this.Opacity + this.Fade * 0.25d / ms, 0, 1);
+        }
+        // quit
+        if (this.Success || this.Failure)
         {
             // well done!
             this.Quit = true;
         }
-
-        if (this.Quit)
+        if (this.Quit && this.Opacity <= 0)
         {
             this.unload();
+            return true;
         }
-        return this.Quit;
+        return false;
     }
 
     public void unload()
