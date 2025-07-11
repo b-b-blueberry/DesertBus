@@ -34,7 +34,6 @@ public class GameRules
     public double PositionDrift = 5d;
     // others
     public double BugSplatDistance = 362000;
-    public int BugSplatFrames = 5;
     // road conditions
     public int Width = 100;
     public int Distance = 580000;
@@ -84,6 +83,9 @@ public class Game : IMinigame
     public double WheelSpeed;
     public double WheelRotation;
 
+    public bool EngineOn;
+    public double EngineTimer;
+
     public double FailTimer;
 
     public int Fade;
@@ -112,11 +114,14 @@ public class Game : IMinigame
         this.Shake = Vector2.Zero;
 
         this.DoorsOpen = false;
-        this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
+        this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : 5;
 
         this.Speed = this.Rules.Speed;
         this.WheelSpeed = 0;
         this.WheelRotation = 0;
+
+        this.EngineOn = this.Speed > 0;
+        this.EngineTimer = 0;
 
         this.FailTimer = 0;
 
@@ -183,6 +188,19 @@ public class Game : IMinigame
             };
     }
 
+    public void Engine()
+    {
+        if (!this.EngineOn)
+        {
+            this.EngineOn = true;
+            this.EngineTimer = 2000;
+            if (Game.StartNoise is null || !Game.StartNoise.IsPlaying)
+            {
+                Game1.playSound("busDriveOff", out Game.StartNoise);
+            }
+        }
+    }
+
     public void Honk()
     {
         Game1.playSound("Duck", pitch: 0);
@@ -202,7 +220,7 @@ public class Game : IMinigame
         float scale = this.Data.Scale;
         Vector2 position;
         Rectangle source;
-        Vector2 shake = this.Shake + new Vector2(0, 5f * (float)Math.Sin(this.State.Distance / 20d));
+        Vector2 shake = this.Shake + new Vector2(0, 3f * (float)Math.Sin(this.State.Distance / 20d)) * scale;
         Color colour = Color.White;
         float alpha = 1f;
 
@@ -213,7 +231,7 @@ public class Game : IMinigame
         double perspective(Vector2 position, float ratio)
         {
             // vanishing point
-            Vector2 far = new(-0.1f + position.X / 2, horizon);
+            Vector2 far = new(-0.125f + position.X / 2, horizon);
 
             // near point
             Vector2 near = new(-0.1f + position.X / position.X * Math.Sign(position.X) * 1.75f + median, position.Y - horizon);
@@ -254,7 +272,7 @@ public class Game : IMinigame
             // fill colour
             float width = this.Rules.Width / 60f;
 
-            Vector2 top = new(-0.25f + (width * 0.4f), 1f - horizon);
+            Vector2 top = new(-0.25f + (width * 0.375f), 1f - horizon);
             Vector2 left = new(-0.25f + 0 + median, 0);
             Vector2 centre = new(-0.25f + width / 2 + median, 0);
             Vector2 right = new(-0.25f + width + median, 0);
@@ -274,7 +292,7 @@ public class Game : IMinigame
                 double d = (double)i / num;
                 double t = (value + d * rate) % rate / rate;
                 float ratio = (float)Math.Pow(t, 2);
-                Vector2 size = new(0.02f, 0.0125f);
+                Vector2 size = new(0.025f, 0.0125f);
 
                 float ratioT = Math.Max(0, ratio - size.Y * 4 * ratio);
                 float ratioB = Math.Max(0, ratio + size.Y * 4 * ratio);
@@ -336,7 +354,7 @@ public class Game : IMinigame
         {
             if (this.BugSplat > 0)
             {
-                position = new Vector2(this.View.Left + this.View.Width * 0.333f, this.View.Top + this.View.Height * 0.333f);
+                position = new Vector2(this.View.Left + this.View.Width * 0.3f, this.View.Top + this.View.Height * 0.4f);
                 source = new(512 + 16 * (int)this.BugSplat, 1696, 16, 16);
                 b.Draw(
                     texture: Game1.mouseCursors,
@@ -350,30 +368,40 @@ public class Game : IMinigame
                     layerDepth: 1);
             }
         }
-        // chronometer
-        {
-            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -17) * scale;
-            this.Clock.Draw(b, position + shake, scale, alpha);
-        }
-        // odometer
-        {
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(110, -17) * scale;
-            this.Odometer.Draw(b, position + shake, scale, alpha);
-        }
-        // dashboard
+        // bus dashboard
         {
             position = this.View.Location.ToVector2();
-            source = new(0, 0, 180, 120);
+            source = new(0, 0, 300, 200);
+            Vector2 origin = source.Size.ToVector2() / 2;
+            Vector2 diff = origin / 2 - this.View.Size.ToVector2() / scale / 2;
             b.Draw(
                 texture: Game.Sprites,
-                position: position + shake,
+                position: position + shake + origin * scale + diff,
                 sourceRectangle: source,
                 color: colour,
                 rotation: 0,
-                origin: Vector2.Zero,
+                origin: origin,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
+        }
+        // engine lights
+        {
+            if (this.EngineTimer > 0 || this.Failure)
+            {
+                position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(28, -50) * scale;
+                source = new(0, 207, 45, 9);
+                b.Draw(
+                    texture: Game.Sprites,
+                    position: position + shake,
+                    sourceRectangle: source,
+                    color: colour,
+                    rotation: 0,
+                    origin: Vector2.Zero,
+                    scale: scale,
+                    effects: SpriteEffects.None,
+                    layerDepth: 1);
+            }
         }
         // driver name
         {
@@ -385,23 +413,50 @@ public class Game : IMinigame
 
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
-            textScale = scale * 0.25f;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(48, 5) * scale;
+            textScale = scale * 0.2f;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(78, 13) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
 
             text = this.State.PlayerName.ToUpper();
             if (text.Length > length)
                 text = $"{text.Take(length)}.";
             textSize = font.MeasureString(text);
-            textScale = scale * 0.5f;
-            position += new Vector2(0, 10) * scale;
+            textScale = scale * 0.3f;
+            position += new Vector2(0, 8) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
+        }
+        // chronometer
+        {
+            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -18) * scale;
+            this.Clock.Draw(b, position + shake, scale, alpha);
+        }
+        // odometer
+        {
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(154, -17) * scale;
+            this.Odometer.Draw(b, position + shake, scale, alpha);
         }
         // speedometer
         {
-            double startRotation = Math.PI; // 6 o'clock
-            double addedRotation = this.Speed / 20; // arbitrary speedo scale magic number to place 70kmh at 1~2 o'clock
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(64, -16) * scale;
+            double startRotation = Math.PI * 1.25d; // 6 o'clock
+            double addedRotation = this.Speed / 120 * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number to place 70kmh at 1~2 o'clock
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(84, -20) * scale;
+            source = new Rectangle(324, 477, 7, 19);
+            b.Draw(
+                texture: Game1.mouseCursors,
+                position: position + shake,
+                sourceRectangle: source,
+                color: colour,
+                rotation: (float)(startRotation + addedRotation),
+                origin: new Vector2(3.5f, 18f),
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
+        // thermometer
+        {
+            double startRotation = Math.PI * 1.75d;
+            double addedRotation = this.FailTimer / this.Rules.FailTime * (Math.PI * 0.5d);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(26, -16) * scale;
             source = new Rectangle(363, 395, 5, 13);
             b.Draw(
                 texture: Game1.mouseCursors,
@@ -414,14 +469,29 @@ public class Game : IMinigame
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
-        // wheel
+        // steering
         {
-            double wheelRotation = this.WheelRotation;
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(36, -8) * scale;
-            source = new Rectangle(228, 465, 37, 37);
+            // column
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50, -4) * scale;
+            source = new Rectangle(187, 200, 23, 57);
             b.Draw(
-                texture: Game1.mouseCursors,
-                position: position + shake,
+                texture: Game.Sprites,
+                position: position + shake * 1.5f,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: source.Size.ToVector2() / 2,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+
+            // wheel
+            double wheelRotation = this.WheelRotation;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50, -28) * scale;
+            source = new Rectangle(210, 200, 90, 90);
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake * 2f,
                 sourceRectangle: source,
                 color: colour,
                 rotation: (float)(wheelRotation),
@@ -433,8 +503,8 @@ public class Game : IMinigame
         // scent tree
         {
             const int numFrames = 8;
-            int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 33d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(116, 28) * scale;
+            int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(180, 36) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
@@ -585,7 +655,7 @@ public class Game : IMinigame
         // shake
         if (isOffRoad && this.Speed > 0)
         {
-            int i = 2;
+            int i = 3;
             if (ticks % 2 == 0)
                 this.Shake = new(Game1.random.Next(-i, i), Game1.random.Next(-i, i));
         }
@@ -597,10 +667,14 @@ public class Game : IMinigame
         {
             this.Odometer.Update(ms, this.State.Distance);
         }
-        // sounds
-        if (speed <= 0 && this.Speed > 0 && (Game.StartNoise is null || !Game.StartNoise.IsPlaying))
+        // engine
+        if (speed <= 0 && this.Speed > 0)
         {
-            Game1.playSound("busDriveOff", out Game.StartNoise);
+            this.Engine();
+        }
+        if (this.EngineTimer > 0)
+        {
+            this.EngineTimer = Math.Max(this.EngineTimer - ms, 0);
         }
         if (Game.RoadNoise is not null)
         {
@@ -630,7 +704,7 @@ public class Game : IMinigame
             {
                 if (this.BugSplat == 0)
                     Game1.playSound("slimeHit");
-                this.BugSplat = (float)Math.Clamp(this.BugSplat + 1d / ms, 0, this.Rules.BugSplatFrames);
+                this.BugSplat = (float)Math.Clamp(this.BugSplat + 1d / ms, 0, 5);
             }
         }
         // lose condition
@@ -854,7 +928,7 @@ public class Clock
 public static class Digits
 {
     public static Texture2D Sprites => Game.Sprites;
-    public static readonly Rectangle Slice = new Rectangle(x: 0, y: 120, width: 5, height: 7);
+    public static readonly Rectangle Slice = new Rectangle(x: 0, y: 200, width: 5, height: 7);
     public static readonly Rectangle[] Sources = new Rectangle[10];
 
     static Digits()
