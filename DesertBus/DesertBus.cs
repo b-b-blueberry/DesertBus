@@ -206,31 +206,71 @@ public class Game : IMinigame
         // road
         {
             //Vector2 size = this.View.Size.ToVector2();
-            Vector2 ratio = this.View.Size.ToVector2() / view.Size.ToVector2();
+            Vector2 viewRatio = this.View.Size.ToVector2() / view.Size.ToVector2();
+            float z = 1f;
             Vector3 viewToVertex(Vector2 position)
             {
-                return new Vector3((new Vector2(position.X, position.Y) * 2f - Vector2.One) * ratio, 0.1f);
+                return new Vector3((new Vector2(position.X, position.Y) * 2f - Vector2.One) * viewRatio, z -= 0.0001f);
             }
 
             this.basicEffect = new(Game1.graphics.GraphicsDevice);
             this.basicEffect.VertexColorEnabled = true;
 
             // fill colour
-            Color c = new(95, 90, 95);
             float width = this.Rules.Width / 60f;
-            var vertices = new Vector3[] {
-                viewToVertex(new(-0.25f + 0 + median, 0)),
-                viewToVertex(new(-0.25f + (width * 0.4f), 1f - horizon)),
-                viewToVertex(new(-0.25f + width + median, 0)),
-            };
-            var triangles = vertices.Select(v => new VertexPositionColor(v, c)).ToArray();
-            if (triangles.Length % 3 == 0)
+
+            Vector2 top = new(-0.25f + (width * 0.4f), 1f - horizon);
+            Vector2 left = new(-0.25f + 0 + median, 0);
+            Vector2 centre = new(-0.25f + width / 2 + median, 0);
+            Vector2 right = new(-0.25f + width + median, 0);
+
+            Vector3[] vertices = [
+                viewToVertex(left),
+                viewToVertex(top),
+                viewToVertex(right),
+            ];
+            var triangles = vertices.Select(v => new VertexPositionColor(v, new(95, 90, 95))).ToArray();
+
+            const int num = 9;
+            for (int i = 0; i < num; ++i)
             {
-                foreach (EffectPass pass in this.basicEffect.CurrentTechnique.Passes)
-                {
-                    pass.Apply();
-                    Game1.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangles, 0, triangles.Length / 3);
-                }
+                double value = this.State.Distance / 3;
+                double rate = 100;
+                double d = (double)i / num;
+                double t = (value + d * rate) % rate / rate;
+                float ratio = (float)Math.Pow(t, 2);
+                Vector2 size = new(0.02f, 0.0125f);
+
+                float ratioT = Math.Max(0, ratio - size.Y * 4 * ratio);
+                float ratioB = Math.Max(0, ratio + size.Y * 4 * ratio);
+
+                Vector2 TL = new(-size.X, +size.Y);
+                Vector2 TR = new(+size.X, +size.Y);
+                Vector2 BL = new(-size.X, -size.Y);
+                Vector2 BR = new(+size.X, -size.Y);
+
+                Vector2 lerpTL = Vector2.Lerp(top, centre + TL, (float)Math.Pow(ratioT, 2));
+                Vector2 lerpTR = Vector2.Lerp(top, centre + TR, (float)Math.Pow(ratioT, 2));
+                Vector2 lerpBR = Vector2.Lerp(top, centre + BR, (float)Math.Pow(ratioB, 2));
+                Vector2 lerpBL = Vector2.Lerp(top, centre + BL, (float)Math.Pow(ratioB, 2));
+
+                vertices = [
+                    // desperate times
+                    viewToVertex(lerpBL), // BL
+                    viewToVertex(lerpTR), // TR
+                    viewToVertex(lerpBR), // BR
+                    //
+                    viewToVertex(lerpBL), // BL
+                    viewToVertex(lerpTL), // TL
+                    viewToVertex(lerpTR), // TR
+                ];
+                triangles = triangles.Concat(vertices.Select(v => new VertexPositionColor(v, new Color(245, 185, 0)))).ToArray();
+            }
+
+            foreach (EffectPass pass in this.basicEffect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+                Game1.graphics.GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, triangles, 0, triangles.Length / 3);
             }
         }
 
