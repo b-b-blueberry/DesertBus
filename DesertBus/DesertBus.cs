@@ -173,7 +173,7 @@ public class Game : IMinigame
         float scale = this.Data.Scale;
         Vector2 position;
         Rectangle source;
-        Vector2 shake = this.Shake + new Vector2(0, 3f * (float)Math.Sin(this.State.Distance / 15d));
+        Vector2 shake = this.Shake + new Vector2(0, 5f * (float)Math.Sin(this.State.Distance / 20d));
         Color colour = Color.White;
         float alpha = 1f;
 
