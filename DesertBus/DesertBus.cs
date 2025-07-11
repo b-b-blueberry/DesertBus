@@ -108,6 +108,7 @@ public class Game : IMinigame
             this.addDecor(randomY: true);
 
         this.Opacity = 1;
+        this.Shake = Vector2.Zero;
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
 
         this.Speed = 0;
@@ -167,7 +168,7 @@ public class Game : IMinigame
     public void draw(SpriteBatch b)
     {
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
-
+        
         Rectangle view = Game1.game1.localMultiplayerWindow;
         float scale = this.Data.Scale;
         Vector2 position;
