@@ -733,6 +733,7 @@ public class Game : IMinigame
         if (this.Quit && this.Opacity <= 0)
         {
             this.unload();
+            Game1.globalFadeToClear();
             return true;
         }
         return false;
