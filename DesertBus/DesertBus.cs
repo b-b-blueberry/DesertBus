@@ -76,7 +76,9 @@ public class Game : IMinigame
     public float Opacity;
     public Vector2 Shake;
 
-    public bool DoorsOpen;
+    public int DoorsOpen;
+    public float DoorsTimer;
+
     public float BugSplat;
 
     public double Speed;
@@ -113,7 +115,9 @@ public class Game : IMinigame
         this.Opacity = 0;
         this.Shake = Vector2.Zero;
 
-        this.DoorsOpen = false;
+        this.DoorsOpen = 1;
+        this.DoorsTimer = 1;
+
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : 5;
 
         this.Speed = this.Rules.Speed;
@@ -208,8 +212,8 @@ public class Game : IMinigame
 
     public void Doors()
     {
-        Game1.playSound("trashcanlid", pitch: this.DoorsOpen ? 100 : 0);
-        this.DoorsOpen = !this.DoorsOpen;
+        Game1.playSound("trashcanlid", pitch: this.DoorsOpen > 0 ? 100 : 0);
+        this.DoorsOpen = this.DoorsOpen * -1;
     }
 
     public void draw(SpriteBatch b)
@@ -469,10 +473,26 @@ public class Game : IMinigame
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
+        // door handle
+        {
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(170, -16) * scale
+                + new Vector2(this.DoorsTimer * 32, 4 * (float)Math.Sin(Math.PI * this.DoorsTimer)) * scale;
+            source = new Rectangle(191, 257, 15, 43);
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake * 1.5f,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: source.Size.ToVector2() / 2,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // steering
         {
             // column
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50, -4) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50.5f, -4) * scale;
             source = new Rectangle(187, 200, 23, 57);
             b.Draw(
                 texture: Game.Sprites,
@@ -699,6 +719,10 @@ public class Game : IMinigame
             {
                 decor.Update(ms, this.Speed);
             }
+        }
+        // doors
+        {
+            this.DoorsTimer = (float)Math.Clamp(this.DoorsTimer + ms / 250 * this.DoorsOpen, 0, 1);
         }
         // bugsplat
         {
