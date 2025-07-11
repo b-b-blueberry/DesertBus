@@ -87,9 +87,9 @@ public class Game : IMinigame
     public double EngineTimer;
 
     public double FailTimer;
+    public double EndGameTimer;
 
     public int Fade;
-    public bool AllowInput;
     public bool Quit;
 
     public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
@@ -124,9 +124,9 @@ public class Game : IMinigame
         this.EngineTimer = 0;
 
         this.FailTimer = 0;
+        this.EndGameTimer = 5000;
 
         this.Fade = 0;
-        this.AllowInput = true;
         this.Quit = false;
 
         // add roadside decor
@@ -615,18 +615,20 @@ public class Game : IMinigame
         bool isOutOfBounds = isOffRoad && Math.Abs(this.State.Position) >= this.Rules.Width;
 
         // speed
+        if (!this.Failure)
         {
             double force = this.Rules.Deceleration * (1 + 2 * this.FailTimer / this.Rules.FailTime);
 
-            if (this.AllowInput && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton))
+            if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton))
                 force += this.Rules.Braking;
-            else if (this.AllowInput && !isOffRoad && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton))
+            else if (!isOffRoad && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton))
                 force += this.Rules.Acceleration * (1 - this.FailTimer / this.Rules.FailTime);
 
             this.Speed = Math.Clamp(this.Speed + force / ms, 0, this.Rules.MaxSpeed);
             this.State.Distance = Math.Clamp(this.State.Distance + this.Speed / 60d, 0, this.Rules.Distance + this.Rules.MaxSpeed * 10); // a little extra for fade-out
         }
         // steering
+        if (!this.Failure)
         {
             // player steering eases in and out to be cool & annoying
             double rotationBounds = Math.PI * this.Rules.SteeringRotations;
@@ -720,9 +722,14 @@ public class Game : IMinigame
         // fade alpha
         {
             this.Fade = 1;
-            if (this.Quit)
+            if (this.EndGameTimer <= 0)
                 this.Fade = -1;
             this.Opacity = (float)Math.Clamp(this.Opacity + this.Fade * 0.25d / ms, 0, 1);
+        }
+        // end game
+        if (this.Failure && this.EndGameTimer > 0)
+        {
+            this.EndGameTimer = Math.Max(this.EndGameTimer - ms, 0);
         }
         // quit
         if (this.Success || this.Failure)
@@ -778,6 +785,7 @@ public class Game : IMinigame
         if (k is Keys.Escape)
         {
             this.Quit = true;
+            this.EndGameTimer = 0;
             return;
         }
     }
