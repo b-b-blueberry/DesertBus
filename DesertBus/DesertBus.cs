@@ -31,6 +31,9 @@ public class GameRules
     public double SteeringDecay = -0.5d;
     public double SteeringRotations = 3d;
     public double PositionDrift = 5d;
+    // others
+    public double BugSplatDistance = 362000;
+    public int BugSplatFrames = 5;
     // road conditions
     public int Width = 100;
     public int Distance = 580000;
@@ -72,6 +75,7 @@ public class Game : IMinigame
     public Rectangle View;
     public float Opacity;
     public Vector2 Shake;
+    public float BugSplat;
 
     public double Speed;
     public double WheelSpeed;
@@ -104,6 +108,7 @@ public class Game : IMinigame
             this.addDecor(randomY: true);
 
         this.Opacity = 1;
+        this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
 
         this.Speed = 0;
         this.WheelSpeed = 0;
@@ -297,6 +302,24 @@ public class Game : IMinigame
 
         // FOREGROUND
 
+        // bugsplat
+        {
+            if (this.BugSplat > 0)
+            {
+                position = new Vector2(this.View.Left + this.View.Width * 0.333f, this.View.Top + this.View.Height * 0.333f);
+                source = new(512 + 16 * (int)this.BugSplat, 1696, 16, 16);
+                b.Draw(
+                    texture: Game1.mouseCursors,
+                    position: position + shake,
+                    sourceRectangle: source,
+                    color: colour,
+                    rotation: 0,
+                    origin: Vector2.Zero,
+                    scale: scale,
+                    effects: SpriteEffects.None,
+                    layerDepth: 1);
+            }
+        }
         // chronometer
         {
             position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -17) * scale;
@@ -569,6 +592,15 @@ public class Game : IMinigame
             foreach (Decor decor in this.Decor)
             {
                 decor.Update(ms, this.Speed);
+            }
+        }
+        // bugsplat
+        {
+            if (this.State.Distance >= this.Rules.BugSplatDistance)
+            {
+                if (this.BugSplat == 0)
+                    Game1.playSound("slimeHit");
+                this.BugSplat = (float)Math.Clamp(this.BugSplat + 1d / ms, 0, this.Rules.BugSplatFrames);
             }
         }
         // lose condition
