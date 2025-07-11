@@ -372,6 +372,21 @@ public class Game : IMinigame
                     layerDepth: 1);
             }
         }
+        // wipers
+        {
+            position = this.View.Center.ToVector2() + new Vector2(48, 8) * scale;
+            source = new(0, 216, 148, 84);
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake * 1.25f + this.Shake * 0.5f * scale,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: source.Size.ToVector2() / 2,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // bus dashboard
         {
             position = this.View.Location.ToVector2();
