@@ -443,7 +443,7 @@ public class Game : IMinigame
             if (this.State.PlayerID != -1)
             {
                 Farmer player = Game1.player;
-                position += new Vector2(48, 10) * scale;
+                position += new Vector2(47, 10) * scale;
                 player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player);
             }
             else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
@@ -457,9 +457,9 @@ public class Game : IMinigame
                 {
                     texture = npc.Sprite.Texture;
                 }
-                position += new Vector2(48, 3) * scale;
+                position += new Vector2(47, 3) * scale;
                 source = npc.getMugShotSourceRect();
-                b.Draw(texture, position + shake, source, colour, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
+                b.Draw(texture, position + shake, source, Color.Lerp(colour, Color.Beige, 0.95f) * 0.85f, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
             }
         }
         // driver name
@@ -473,7 +473,7 @@ public class Game : IMinigame
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(84, 13) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(87, 13) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
 
             text = this.State.PlayerName.ToUpper();
