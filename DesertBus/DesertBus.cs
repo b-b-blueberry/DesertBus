@@ -107,6 +107,14 @@ public class Game : IMinigame
         for (int i = 0; i < Game1.random.Next(3); ++i)
             this.addDecor(randomY: true);
 
+        // add bus stop
+        Decor decor = this.Decor.Get();
+        decor.Position = 0.01d;
+        decor.Distance = 0.3d;
+        decor.Sprites = new Dictionary<float, Rectangle>{
+            {0f, new(323, 477, 9, 19)},
+        };
+
         this.Opacity = 1;
         this.Shake = Vector2.Zero;
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
