@@ -407,6 +407,31 @@ public class Game : IMinigame
                     layerDepth: 1);
             }
         }
+        // driver photo
+        {
+            position = new Vector2(this.View.Left, this.View.Top);
+            if (this.State.PlayerID != -1)
+            {
+                Farmer player = Game1.player;
+                position += new Vector2(48, 10) * scale;
+                player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player);
+            }
+            else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
+            {
+                Texture2D texture;
+                try
+                {
+                    texture = Game1.content.Load<Texture2D>($"Characters/{npc.getTextureName()}");
+                }
+                catch
+                {
+                    texture = npc.Sprite.Texture;
+                }
+                position += new Vector2(48, 3) * scale;
+                source = npc.getMugShotSourceRect();
+                b.Draw(texture, position + shake, source, colour, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
+            }
+        }
         // driver name
         {
             string text;
@@ -418,16 +443,16 @@ public class Game : IMinigame
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(78, 13) * scale;
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(84, 13) * scale;
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
 
             text = this.State.PlayerName.ToUpper();
             if (text.Length > length)
                 text = $"{text.Take(length)}.";
             textSize = font.MeasureString(text);
-            textScale = scale * 0.3f;
+            textScale = scale * 0.333f;
             position += new Vector2(0, 8) * scale;
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, colour, textScale);
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
         }
         // chronometer
         {
