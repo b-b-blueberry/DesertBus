@@ -65,9 +65,7 @@ public class ModEntry : Mod
     {
         NPC pam = ModEntry.Pam;
         bool isBusStop = location is BusStop
-            && location.characters.Contains(pam)
-            && pam.TilePoint.X == 21
-            && pam.TilePoint.Y == 10;
+            && location.characters.Contains(pam);
         bool isDesert = location is Desert
             && !Desert.warpedToDesert;
         return pam is not null && (isBusStop || isDesert);
