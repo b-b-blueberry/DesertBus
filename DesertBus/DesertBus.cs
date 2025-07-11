@@ -422,6 +422,21 @@ public class Game : IMinigame
                     layerDepth: 1);
             }
         }
+        // mirror
+        {
+            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 22) * scale;
+            source = new(0, 300, 80, 32);
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake * 1.25f,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: source.Size.ToVector2() / 2,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // driver photo
         {
             position = new Vector2(this.View.Left, this.View.Top);
@@ -471,7 +486,7 @@ public class Game : IMinigame
         }
         // chronometer
         {
-            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -18) * scale;
+            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -20) * scale;
             this.Clock.Draw(b, position + shake, scale, alpha);
         }
         // odometer
@@ -500,7 +515,7 @@ public class Game : IMinigame
         {
             double startRotation = Math.PI * 1.75d;
             double addedRotation = this.FailTimer / this.Rules.FailTime * (Math.PI * 0.5d);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(26, -16) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(34, -16) * scale;
             source = new Rectangle(363, 395, 5, 13);
             b.Draw(
                 texture: Game1.mouseCursors,
@@ -564,12 +579,12 @@ public class Game : IMinigame
         {
             const int numFrames = 8;
             int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(180, 36) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 38) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
                 texture: Game1.mouseCursors,
-                position: position + shake,
+                position: position + shake * 1.5f,
                 color: colour,
                 sourceRectangle: source,
                 rotation: 0,
