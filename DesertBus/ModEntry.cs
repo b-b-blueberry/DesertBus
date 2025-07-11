@@ -95,10 +95,9 @@ public class ModEntry : Mod
         GameRules rules = test ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
 
         bool isPamDriving = ModEntry.IsPamDriving(location);
-        bool isPlayerDriving = ModEntry.IsPlayerDriving(location);
 
-        long id = isPlayerDriving && !isPamDriving ? player.UniqueMultiplayerID : -1;
         string name = isPamDriving ? pam.displayName : player.Name;
+        long id = isPamDriving ? -1 : player.UniqueMultiplayerID;
 
         if (rules is not null)
         {
