@@ -21,6 +21,7 @@ public class GameRules
     public string From = null;
     public string To = null;
     // bus model
+    public int Speed = 35;
     public int MaxSpeed = 70;
     public double Acceleration = 1.5d;
     public double Deceleration = -0.666d;
@@ -119,7 +120,7 @@ public class Game : IMinigame
         this.Shake = Vector2.Zero;
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
 
-        this.Speed = 0;
+        this.Speed = this.Rules.Speed;
         this.WheelSpeed = 0;
         this.WheelRotation = 0;
 
