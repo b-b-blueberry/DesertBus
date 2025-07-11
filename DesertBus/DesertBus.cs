@@ -548,6 +548,10 @@ public class Game : IMinigame
             this.Quit = true;
         }
 
+        if (this.Quit)
+        {
+            this.unload();
+        }
         return this.Quit;
     }
 
