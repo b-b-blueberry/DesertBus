@@ -99,7 +99,7 @@ public class Game : IMinigame
         this.Clock = new();
         this.Odometer = new(digits: 6u, start: 601093d);
 
-        this.Decor = new(size: 32, create: () => new Decor());
+        this.Decor = new(size: 8, create: () => new Decor());
         for (int i = 0; i < Game1.random.Next(3); ++i)
             this.addDecor(randomY: true);
 
@@ -143,7 +143,7 @@ public class Game : IMinigame
         Decor decor = this.Decor.Get();
         decor.Position = Game1.random.NextDouble() - 0.5d;
         decor.Distance = randomY ? Game1.random.NextDouble() * 0.25d : 0d;
-        if (0d < decor.Position && decor.Position < 0.05d)
+        if (0d < decor.Position && decor.Position < 0.05d && this.State.Distance % 10 == 0)
             // sign
             decor.Sprites = new Dictionary<float, Rectangle>{
                 {0.3f, new(323, 477, 9, 19)},
@@ -522,7 +522,7 @@ public class Game : IMinigame
         }
         // decor
         {
-            if (this.Speed > 0 && ticks % 60 == 0 && Game1.random.NextDouble() * 2d * this.Rules.MaxSpeed * 0.9d < this.Speed)
+            if (this.Speed > 0 && ticks % 60 == 0 && Game1.random.NextDouble() * 5d * this.Rules.MaxSpeed * 0.9d < this.Speed)
             {
                 this.addDecor();
             }
