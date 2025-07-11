@@ -213,7 +213,7 @@ public class Game : IMinigame
     public void Doors()
     {
         Game1.playSound("trashcanlid", pitch: this.DoorsOpen > 0 ? 100 : 0);
-        this.DoorsOpen = this.DoorsOpen * -1;
+        this.DoorsOpen *= -1;
     }
 
     public void draw(SpriteBatch b)
@@ -505,7 +505,7 @@ public class Game : IMinigame
             source = new Rectangle(191, 257, 15, 43);
             b.Draw(
                 texture: Game.Sprites,
-                position: position + shake * 1.5f,
+                position: position + shake * 1.25f,
                 sourceRectangle: source,
                 color: colour,
                 rotation: 0,
