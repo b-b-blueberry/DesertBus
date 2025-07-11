@@ -693,7 +693,7 @@ public class Game : IMinigame
         }
 
         // doors
-        if (Game1.options.menuButton.Any(key => key.key == k))
+        if (Game1.options.mapButton.Any(key => key.key == k))
         {
             this.Doors();
             return;
