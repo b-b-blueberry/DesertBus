@@ -108,17 +108,6 @@ public class Game : IMinigame
         this.Odometer = new(digits: 6u, start: 601093d);
 
         this.Decor = new(size: 8, create: () => new Decor());
-        for (int i = 0; i < Game1.random.Next(3); ++i)
-            this.AddDecor(randomY: true);
-
-        // add bus stop
-        Decor decor = this.Decor.Get();
-        decor.Position = 0.01d;
-        decor.Distance = 0.3d;
-        decor.Sprites = new Dictionary<float, Rectangle>{
-            {0f, new(323, 477, 9, 19)},
-        };
-
         this.Opacity = 0;
         this.Shake = Vector2.Zero;
 
@@ -134,6 +123,21 @@ public class Game : IMinigame
         this.Fade = 0;
         this.AllowInput = true;
         this.Quit = false;
+
+        // add roadside decor
+        for (int i = 0; i < Game1.random.Next(3); ++i)
+            this.AddDecor(randomY: true);
+
+        // add bus stop
+        if (this.Speed <= 0)
+        {
+            Decor decor = this.Decor.Get();
+            decor.Position = 0.01d;
+            decor.Distance = 0.3d;
+            decor.Sprites = new Dictionary<float, Rectangle>{
+                {0f, new(323, 477, 9, 19)},
+            };
+        }
 
         Game1.playSound("roadnoise", out Game.RoadNoise);
         if (Game.RoadNoise is not null)
