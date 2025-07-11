@@ -76,13 +76,14 @@ public class Game : IMinigame
     public Rectangle View;
     public float Opacity;
     public Vector2 Shake;
+
+    public bool DoorsOpen;
     public float BugSplat;
 
     public double Speed;
     public double WheelSpeed;
     public double WheelRotation;
 
-    //public double DoorTimer;
     public double FailTimer;
 
     public int Fade;
@@ -108,7 +109,7 @@ public class Game : IMinigame
 
         this.Decor = new(size: 8, create: () => new Decor());
         for (int i = 0; i < Game1.random.Next(3); ++i)
-            this.addDecor(randomY: true);
+            this.AddDecor(randomY: true);
 
         // add bus stop
         Decor decor = this.Decor.Get();
@@ -120,6 +121,8 @@ public class Game : IMinigame
 
         this.Opacity = 0;
         this.Shake = Vector2.Zero;
+
+        this.DoorsOpen = false;
         this.BugSplat = this.State.Distance < this.Rules.BugSplatDistance ? 0 : this.Rules.BugSplatFrames;
 
         this.Speed = this.Rules.Speed;
@@ -155,7 +158,7 @@ public class Game : IMinigame
         this.View = new(viewport.X + viewport.Width / 2 - size.X / 2, viewport.Y + viewport.Height / 2 - size.Y / 2, size.X, size.Y);
     }
 
-    public void addDecor(bool randomY = false)
+    public void AddDecor(bool randomY = false)
     {
         Decor decor = this.Decor.Get();
         decor.Position = Game1.random.NextDouble() - 0.5d;
@@ -174,6 +177,17 @@ public class Game : IMinigame
                 {0.1f, new(137, 412, 10, 11)},
                 {0f, new(433, 451, 3, 3)},
             };
+    }
+
+    public void Honk()
+    {
+        Game1.playSound("Duck", pitch: 0);
+    }
+
+    public void Doors()
+    {
+        Game1.playSound("trashcanlid", pitch: this.DoorsOpen ? 100 : 0);
+        this.DoorsOpen = !this.DoorsOpen;
     }
 
     public void draw(SpriteBatch b)
@@ -599,7 +613,7 @@ public class Game : IMinigame
         {
             if (this.Speed > 0 && ticks % 60 == 0 && Game1.random.NextDouble() * 5d * this.Rules.MaxSpeed * 0.9d < this.Speed)
             {
-                this.addDecor();
+                this.AddDecor();
             }
             foreach (Decor decor in this.Decor)
             {
@@ -668,9 +682,16 @@ public class Game : IMinigame
     public void receiveKeyPress(Keys k)
     {
         // honk
-        if (Game1.options.emoteButton.Any(key => key.key == k))
+        if (Game1.options.journalButton.Any(key => key.key == k))
         {
-            Game1.playSound("Duck", pitch: 0);
+            this.Honk();
+            return;
+        }
+
+        // doors
+        if (Game1.options.menuButton.Any(key => key.key == k))
+        {
+            this.Doors();
             return;
         }
 
@@ -689,12 +710,12 @@ public class Game : IMinigame
 
     public void receiveLeftClick(int x, int y, bool playSound = true)
     {
-
+        this.Honk();
     }
 
     public void receiveRightClick(int x, int y, bool playSound = true)
     {
-
+        this.Doors();
     }
 
     public void releaseLeftClick(int x, int y)
