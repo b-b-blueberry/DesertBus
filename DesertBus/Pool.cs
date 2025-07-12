@@ -38,7 +38,7 @@ public class Pool<T> : IEnumerable<T> where T : IPooled
             value.Reset();
             return value;
         }
-        // Get oldest
+        // Get whichever
         {
             T value = this.Values.First();
             value.Reset();

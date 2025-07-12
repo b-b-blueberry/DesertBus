@@ -376,7 +376,7 @@ public class Game : IMinigame
         }
         // wipers
         {
-            position = this.View.Center.ToVector2() + new Vector2(52, 8) * scale;
+            position = this.View.Center.ToVector2() + new Vector2(52, 4) * scale;
             source = new(0, 216, 172, 84);
             b.Draw(
                 texture: Game.Sprites,
@@ -388,6 +388,11 @@ public class Game : IMinigame
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
+        }
+        // odometer
+        {
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(165, -23) * scale;
+            this.Odometer.Draw(b, position + shake, scale, alpha);
         }
         // bus dashboard
         {
@@ -427,7 +432,7 @@ public class Game : IMinigame
         // mirror
         {
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 32) * scale;
-            source = new(0, 300, 80, 32);
+            source = new(0, 300, 80, 34);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 1.25f,
@@ -491,11 +496,6 @@ public class Game : IMinigame
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(72, 11) * scale;
             this.Clock.Draw(b, position + shake, scale, alpha);
         }
-        // odometer
-        {
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(165, -23) * scale;
-            this.Odometer.Draw(b, position + shake, scale, alpha);
-        }
         // speedometer
         {
             double startRotation = Math.PI * 1.25d; // 7:30 o'clock
@@ -517,7 +517,7 @@ public class Game : IMinigame
         {
             double startRotation = Math.PI * 1.25d; // 6 o'clock
             double addedRotation = Math.Max(0, this.Speed / 100d * Math.PI * 0.5d // increase with speed
-                + 0.5d * Math.Abs(Math.Sin(this.Speed / 10)) * Math.PI // pretend we're changing gears
+                + 0.75d * Math.Abs(Math.Sin(this.Speed / 10)) * Math.PI // pretend we're changing gears
                 - this.FailTimer / this.Rules.FailTime * Math.PI / 5d); // choke on dirt
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(0, -27f) * scale;
             source = new Rectangle(324, 477, 7, 19);
@@ -568,9 +568,9 @@ public class Game : IMinigame
         }
         // door handle
         {
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(174, -16) * scale
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(176, -12) * scale
                 + new Vector2(this.DoorsTimer * 32, 4 * (float)Math.Sin(Math.PI * this.DoorsTimer)) * scale;
-            source = new Rectangle(191, 257, 15, 43);
+            source = new Rectangle(176, 257, 15, 43);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 1.25f,
@@ -586,7 +586,7 @@ public class Game : IMinigame
         {
             // column
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -4) * scale;
-            source = new Rectangle(187, 200, 23, 57);
+            source = new Rectangle(172, 200, 23, 57);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 1.5f,
@@ -601,7 +601,7 @@ public class Game : IMinigame
             // wheel
             double wheelRotation = this.WheelRotation;
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -28) * scale;
-            source = new Rectangle(210, 200, 90, 90);
+            source = new Rectangle(200, 200, 100, 100);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 2f,
@@ -1006,6 +1006,7 @@ public class Odometer
             Vector2 drawSize = new Vector2(Digits.Slice.Width * this.Offsets.Length, Digits.Slice.Height) * scale;
             Vector2 drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
             Rectangle drawArea = new Rectangle(drawPosition.ToPoint(), drawSize.ToPoint());
+            drawArea.Inflate(1 * scale, 1 * scale); // this line DESTROYS float arithmetic gaps
             Utility.DrawSquare(b, drawArea, 0, null, Color.Black);
 
             drawSize = Digits.Slice.Size.ToVector2() * scale;
@@ -1019,7 +1020,7 @@ public class Odometer
         for (int i = digits.Length - 1; i >= 0; --i)
         {
             uint digit = (uint)digits[i] - '0';
-            uint below = (uint)((digit + 1) % (Digits.Sources.Length));
+            uint below = ((digit + 1) % 10);
             float offset = (this.Offsets[i]) * scale;
             Color colour = (i == digits.Length - 1 ? Color.Black : Color.White) * alpha;
 
