@@ -376,8 +376,8 @@ public class Game : IMinigame
         }
         // wipers
         {
-            position = this.View.Center.ToVector2() + new Vector2(48, 8) * scale;
-            source = new(0, 216, 148, 84);
+            position = this.View.Center.ToVector2() + new Vector2(52, 8) * scale;
+            source = new(0, 216, 172, 84);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 1.25f + this.Shake * 0.5f * scale,
@@ -426,7 +426,7 @@ public class Game : IMinigame
         }
         // mirror
         {
-            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 22) * scale;
+            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 32) * scale;
             source = new(0, 300, 80, 32);
             b.Draw(
                 texture: Game.Sprites,
@@ -475,7 +475,7 @@ public class Game : IMinigame
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(87, 13) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(87, 12) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
 
             text = this.State.PlayerName.ToUpper();
@@ -483,24 +483,24 @@ public class Game : IMinigame
                 text = $"{text.Take(length)}.";
             textSize = font.MeasureString(text);
             textScale = scale * 0.333f;
-            position += new Vector2(0, 8) * scale;
+            position += new Vector2(0, 10) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
         }
         // chronometer
         {
-            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-6, -20) * scale;
+            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(72, 11) * scale;
             this.Clock.Draw(b, position + shake, scale, alpha);
         }
         // odometer
         {
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(154, -17) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(165, -23) * scale;
             this.Odometer.Draw(b, position + shake, scale, alpha);
         }
         // speedometer
         {
             double startRotation = Math.PI * 1.25d; // 6 o'clock
-            double addedRotation = this.Speed / 120 * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number to place 70kmh at 1~2 o'clock
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(84, -20) * scale;
+            double addedRotation = this.Speed / 100 * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number for speed 0~100 at 7:30~4:30 o'clock respectively
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(98.5f, -27f) * scale;
             source = new Rectangle(324, 477, 7, 19);
             b.Draw(
                 texture: Game1.mouseCursors,
@@ -517,7 +517,7 @@ public class Game : IMinigame
         {
             double startRotation = Math.PI * 1.75d;
             double addedRotation = this.FailTimer / this.Rules.FailTime * (Math.PI * 0.5d);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(34, -16) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(69, -4) * scale;
             source = new Rectangle(363, 395, 5, 13);
             b.Draw(
                 texture: Game1.mouseCursors,
@@ -532,7 +532,7 @@ public class Game : IMinigame
         }
         // door handle
         {
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(170, -16) * scale
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(174, -16) * scale
                 + new Vector2(this.DoorsTimer * 32, 4 * (float)Math.Sin(Math.PI * this.DoorsTimer)) * scale;
             source = new Rectangle(191, 257, 15, 43);
             b.Draw(
@@ -549,7 +549,7 @@ public class Game : IMinigame
         // steering
         {
             // column
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50.5f, -4) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -4) * scale;
             source = new Rectangle(187, 200, 23, 57);
             b.Draw(
                 texture: Game.Sprites,
@@ -564,7 +564,7 @@ public class Game : IMinigame
 
             // wheel
             double wheelRotation = this.WheelRotation;
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(50, -28) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -28) * scale;
             source = new Rectangle(210, 200, 90, 90);
             b.Draw(
                 texture: Game.Sprites,
@@ -581,7 +581,7 @@ public class Game : IMinigame
         {
             const int numFrames = 8;
             int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 38) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 48) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
