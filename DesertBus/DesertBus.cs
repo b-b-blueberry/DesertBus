@@ -498,9 +498,28 @@ public class Game : IMinigame
         }
         // speedometer
         {
-            double startRotation = Math.PI * 1.25d; // 6 o'clock
-            double addedRotation = this.Speed / 100 * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number for speed 0~100 at 7:30~4:30 o'clock respectively
+            double startRotation = Math.PI * 1.25d; // 7:30 o'clock
+            double addedRotation = this.Speed / 100d * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number for speed 0~100 at 7:30~4:30 o'clock respectively
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(98.5f, -27f) * scale;
+            source = new Rectangle(324, 477, 7, 19);
+            b.Draw(
+                texture: Game1.mouseCursors,
+                position: position + shake,
+                sourceRectangle: source,
+                color: colour,
+                rotation: (float)(startRotation + addedRotation),
+                origin: new Vector2(3.5f, 18f),
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
+        // revometer
+        {
+            double startRotation = Math.PI * 1.25d; // 6 o'clock
+            double addedRotation = Math.Max(0, this.Speed / 100d * Math.PI * 0.5d // increase with speed
+                + 0.5d * Math.Abs(Math.Sin(this.Speed / 10)) * Math.PI // pretend we're changing gears
+                - this.FailTimer / this.Rules.FailTime * Math.PI / 5d); // choke on dirt
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(0, -27f) * scale;
             source = new Rectangle(324, 477, 7, 19);
             b.Draw(
                 texture: Game1.mouseCursors,
@@ -518,6 +537,23 @@ public class Game : IMinigame
             double startRotation = Math.PI * 1.75d;
             double addedRotation = this.FailTimer / this.Rules.FailTime * (Math.PI * 0.5d);
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(69, -4) * scale;
+            source = new Rectangle(363, 395, 5, 13);
+            b.Draw(
+                texture: Game1.mouseCursors,
+                position: position + shake,
+                sourceRectangle: source,
+                color: colour,
+                rotation: (float)(startRotation + addedRotation),
+                origin: new Vector2(2.5f, 12),
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
+        // fullo'fuelometer
+        {
+            double startRotation = Math.PI * 2.1d;
+            double addedRotation = Math.Sin(this.State.Distance / 2000) / Math.PI / 2;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(31, -4) * scale;
             source = new Rectangle(363, 395, 5, 13);
             b.Draw(
                 texture: Game1.mouseCursors,
