@@ -774,6 +774,13 @@ public class Game : IMinigame
             if (ticks % 2 == 0)
                 this.Shake = new(Game1.random.Next(-i, i), Game1.random.Next(-i, i));
         }
+        else if (this.Speed < 0.01d && this.EngineOn)
+        {
+            int i = 3;
+            if (ticks % 2 == 0)
+                this.Shake = new Vector2(Game1.random.Next(-i, i), Game1.random.Next(-i, i))
+                    * (float)(0.1f * Math.Sin(Math.PI + Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 500));
+        }
         else
         {
             this.Shake = Vector2.Zero;
