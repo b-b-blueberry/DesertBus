@@ -998,7 +998,8 @@ public class Clock
 {
     public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha)
     {
-        string text = $"{DateTime.Now.Hour:00} {DateTime.Now.Minute:00}";
+        char c = Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0 ? ' ' : ':';
+        string text = $"{DateTime.Now.Hour:00}{c}{DateTime.Now.Minute:00}";
         Color colour = Color.SpringGreen * alpha;
 
         // DEBUG: backboard
@@ -1009,15 +1010,11 @@ public class Clock
             Utility.DrawSquare(b, drawArea, 0, null, Color.Black);
         }
 
-        //if (Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0)
-        //    return;
-
         // digits
         for (int i = text.Length - 1; i >= 0; --i)
         {
             uint digit = (uint)text[i] - '0';
-            if (digit < Digits.Sources.Length)
-                Digits.draw(b, digit, position, scale, colour);
+            Digits.draw(b, digit, position, scale, colour);
             position -= new Vector2(Digits.Slice.Width * scale, 0);
         }
     }
@@ -1027,7 +1024,7 @@ public static class Digits
 {
     public static Texture2D Sprites => Game.Sprites;
     public static readonly Rectangle Slice = new Rectangle(x: 0, y: 200, width: 5, height: 7);
-    public static readonly Rectangle[] Sources = new Rectangle[10];
+    public static readonly Rectangle[] Sources = new Rectangle[11];
 
     static Digits()
     {
@@ -1045,6 +1042,8 @@ public static class Digits
 
     public static void draw(SpriteBatch b, uint digit, Vector2 position, float scale, Color colour)
     {
+        if (digit < 0 || digit >= Digits.Sources.Length)
+            return;
         b.Draw(
             texture: Digits.Sprites,
             position: position,
