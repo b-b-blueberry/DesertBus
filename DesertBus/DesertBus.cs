@@ -224,7 +224,9 @@ public class Game : IMinigame
         float scale = this.Data.Scale;
         Vector2 position;
         Rectangle source;
-        Vector2 shake = this.Shake + new Vector2(0, 3f * (float)Math.Sin(this.State.Distance / 20d)) * scale;
+        Vector2 shake = this.Shake
+            + new Vector2(0, 3f * (float)Math.Sin(this.State.Distance / 20d)) * scale
+            + new Vector2((float)(Math.Min(100, Math.Abs(this.State.Position)) * Math.Sign(this.State.Position) / 20d), 0) * scale;
         Color colour = Color.White;
         float alpha = 1f;
 
