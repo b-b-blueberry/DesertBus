@@ -10,7 +10,6 @@ namespace DesertBus;
 public class ModConfig
 {
     public bool Intro { get; set; } = true;
-    public bool Metric { get; set; } = true;
 }
 
 public class ModState

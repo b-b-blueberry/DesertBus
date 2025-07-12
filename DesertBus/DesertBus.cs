@@ -598,7 +598,7 @@ public class Game : IMinigame
         // DEBUG: speedometer
         if (ModEntry.Debug)
         {
-            int speed = (int)(this.Speed * (ModEntry.Config.Metric ? 1d : 0.621371d));
+            int speed = (int)(this.Speed);
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(70, -12) * scale;
             Utility.drawTinyDigits(
                 toDraw: speed,
@@ -611,7 +611,7 @@ public class Game : IMinigame
         // DEBUG: odometer
         if (ModEntry.Debug)
         {
-            int distance = (int)(this.State.Distance / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d));
+            int distance = (int)(this.State.Distance / 1000d);
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(106, -12) * scale;
             Utility.drawTinyDigits(
                 toDraw: distance,
@@ -951,7 +951,7 @@ public class Odometer
     public void Update(double ms, double value)
     {
         this.Value = value;
-        this.DisplayValue = this.InitialDisplayValue + value / 1000d * (ModEntry.Config.Metric ? 1d : 0.621371d);
+        this.DisplayValue = this.InitialDisplayValue + value / 1000d;
 
         // adjust digit offsets
         string digits = ((uint)this.DisplayValue).ToString();
