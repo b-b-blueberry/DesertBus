@@ -288,7 +288,7 @@ public class Game : IMinigame
             ];
             var triangles = vertices.Select(v => new VertexPositionColor(v, new(95, 90, 95))).ToArray();
 
-            const int num = 9;
+            const int num = 12;
             for (int i = 0; i < num; ++i)
             {
                 double value = this.State.Distance / 3;
@@ -296,10 +296,10 @@ public class Game : IMinigame
                 double d = (double)i / num;
                 double t = (value + d * rate) % rate / rate;
                 float ratio = (float)Math.Pow(t, 2);
-                Vector2 size = new(0.025f, 0.0125f);
+                Vector2 size = new(0.025f, 0.019f);
 
-                float ratioT = Math.Max(0, ratio - size.Y * 4 * ratio);
-                float ratioB = Math.Max(0, ratio + size.Y * 4 * ratio);
+                float ratioT = Math.Max(0, ratio - size.Y * 4 * ratio) * ratio;
+                float ratioB = Math.Max(0, ratio + size.Y * 4 * ratio) * ratio;
 
                 Vector2 TL = new(-size.X, +size.Y);
                 Vector2 TR = new(+size.X, +size.Y);
