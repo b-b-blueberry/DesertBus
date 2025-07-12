@@ -412,6 +412,7 @@ public class Game : IMinigame
                 layerDepth: 1);
         }
         // engine lights
+        if (false)
         {
             if (this.EngineTimer > 0 || this.Failure)
             {
