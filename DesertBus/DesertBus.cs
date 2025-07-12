@@ -39,7 +39,7 @@ public class GameRules
     public int Distance = 580000;
     // lose conditions
     public int FailTime = 5000;
-    public double FailTimeDecay = -0.25d;
+    public double FailTimeDecay = -0.1d;
     // rule conditions
     public string Condition = null;
 }
