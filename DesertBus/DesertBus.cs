@@ -431,7 +431,7 @@ public class Game : IMinigame
         }
         // mirror
         {
-            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 32) * scale;
+            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 36) * scale;
             source = new(0, 300, 80, 34);
             b.Draw(
                 texture: Game.Sprites,
@@ -617,7 +617,7 @@ public class Game : IMinigame
         {
             const int numFrames = 8;
             int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 48) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 52) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
