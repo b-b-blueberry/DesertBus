@@ -435,11 +435,11 @@ public class Game : IMinigame
         }
         // mirror
         {
-            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 36) * scale;
+            position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 37) * scale;
             source = new(0, 300, 80, 34);
             b.Draw(
                 texture: Game.Sprites,
-                position: position + shake * 1.25f,
+                position: position + shake * 1.125f,
                 sourceRectangle: source,
                 color: colour,
                 rotation: 0,
@@ -505,14 +505,14 @@ public class Game : IMinigame
             double startRotation = Math.PI * 1.25d; // 7:30 o'clock
             double addedRotation = this.Speed / 100d * (Math.PI * 2.75d - startRotation); // arbitrary speedo scale magic number for speed 0~100 at 7:30~4:30 o'clock respectively
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(98.5f, -27f) * scale;
-            source = new Rectangle(324, 477, 7, 19);
+            source = new Rectangle(62, 200, 7, 16);
             b.Draw(
-                texture: Game1.mouseCursors,
+                texture: Game.Sprites,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
                 rotation: (float)(startRotation + addedRotation),
-                origin: new Vector2(3.5f, 18f),
+                origin: new Vector2(4f, 14f),
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -524,15 +524,15 @@ public class Game : IMinigame
                 + 0.75d * Math.Abs(Math.Sin(this.Speed / 10)) * Math.PI // pretend we're changing gears
                 - this.FailTimer / this.Rules.FailTime * Math.PI / 5d) // choke on dirt
                  * this.AcceleratorTimer; // only spool up when accelerating
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(0, -27f) * scale;
-            source = new Rectangle(324, 477, 7, 19);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(1.5f, -27f) * scale;
+            source = new Rectangle(62, 200, 7, 16);
             b.Draw(
-                texture: Game1.mouseCursors,
+                texture: Game.Sprites,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
                 rotation: (float)(startRotation + addedRotation),
-                origin: new Vector2(3.5f, 18f),
+                origin: new Vector2(4f, 14f),
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -541,15 +541,15 @@ public class Game : IMinigame
         {
             double startRotation = Math.PI * 1.75d;
             double addedRotation = this.FailTimer / this.Rules.FailTime * (Math.PI * 0.5d);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(69, -4) * scale;
-            source = new Rectangle(363, 395, 5, 13);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(68, -4) * scale;
+            source = new Rectangle(55, 200, 7, 16);
             b.Draw(
-                texture: Game1.mouseCursors,
+                texture: Game.Sprites,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
                 rotation: (float)(startRotation + addedRotation),
-                origin: new Vector2(2.5f, 12),
+                origin: new Vector2(source.Width / 2f, source.Height - 3),
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -558,15 +558,15 @@ public class Game : IMinigame
         {
             double startRotation = Math.PI * 2.1d;
             double addedRotation = Math.Sin(this.State.Distance / 2000) / Math.PI / 2;
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(31, -4) * scale;
-            source = new Rectangle(363, 395, 5, 13);
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(30, -4) * scale;
+            source = new Rectangle(55, 200, 7, 16);
             b.Draw(
-                texture: Game1.mouseCursors,
+                texture: Game.Sprites,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
                 rotation: (float)(startRotation + addedRotation),
-                origin: new Vector2(2.5f, 12),
+                origin: new Vector2(source.Width / 2f, source.Height - 3),
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -622,7 +622,7 @@ public class Game : IMinigame
         {
             const int numFrames = 8;
             int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 52) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 53) * scale;
             source = new Rectangle(368, 16, 16, 16);
             source.X += source.Width * frame;
             b.Draw(
