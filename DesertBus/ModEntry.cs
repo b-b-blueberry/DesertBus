@@ -39,7 +39,7 @@ public class ModEntry : Mod
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
         helper.Events.Player.Warped += this.OnWarped;
 
-        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, test: true));
+        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true));
 
         GameStateQuery.Register(ModEntry.GSQ_ID, (string[] query, GameStateQueryContext context) => ModEntry.CanDriveTheBus(context.Player, context.Location));
     }
@@ -56,7 +56,18 @@ public class ModEntry : Mod
 
         if (e.OldLocation != e.NewLocation)
         {
-            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name);
+            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, onEnd: success =>
+            {
+                if (success)
+                {
+                    // you get nothing
+                }
+                else
+                {
+                    // then perish
+                    Farmer.passOutFromTired(Game1.player);
+                }
+            });
         }
     }
 
@@ -83,7 +94,7 @@ public class ModEntry : Mod
         return isBusReady && (isPamDriving || isPlayerDriving);
     }
 
-    public static void TryStartGame(string from, string to, bool test = false)
+    public static void TryStartGame(string from, string to, bool forcePlayerToDrive = false, Game.OnEndDelegate onEnd = null)
     {
         if (Game1.currentMinigame is Game currentGame)
         {
@@ -96,9 +107,9 @@ public class ModEntry : Mod
 
         GameStateQueryContext context = new(location, player, null, null, Game1.random);
         GameData data = ModEntry.Instance.Helper.ModContent.Load<GameData>("assets/data.json");
-        GameRules rules = test ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
+        GameRules rules = forcePlayerToDrive ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
 
-        bool isPamDriving = ModEntry.IsPamDriving(location);
+        bool isPamDriving = !forcePlayerToDrive && ModEntry.IsPamDriving(location);
 
         string name = isPamDriving ? pam.displayName : player.Name;
         long id = isPamDriving ? -1 : player.UniqueMultiplayerID;
@@ -114,6 +125,7 @@ public class ModEntry : Mod
                 Position = rules.Width / 4
             };
             Game game = new(data, rules, state);
+            game.OnEnd += onEnd;
             Game1.currentMinigame = game;
             ModEntry.State.Value.Game = game;
         }

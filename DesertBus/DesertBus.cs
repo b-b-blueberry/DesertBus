@@ -101,6 +101,10 @@ public class Game : IMinigame
     public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
     public bool Failure => this.Speed <= 0 && this.FailTimer >= this.Rules.FailTime;
 
+    public delegate void OnEndDelegate(bool success);
+
+    public event OnEndDelegate OnEnd;
+
     public Game(GameData data, GameRules rules, GameState state)
     {
         Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/sprites.png");
@@ -965,11 +969,7 @@ public class Game : IMinigame
         {
             this.unload();
 
-            // now perish
-            if (this.Failure)
-            {
-                Farmer.passOutFromTired(Game1.player);
-            }
+            this.OnEnd?.Invoke(this.Success);
 
             Game1.globalFadeToClear();
 
