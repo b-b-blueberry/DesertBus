@@ -287,12 +287,21 @@ public class Game : IMinigame
         }
 
         // BACKGROUND
-
-        // sky
-        Utility.DrawSquare(b, new(this.View.Left, this.View.Top, this.View.Width, this.View.Height / 3), 0, null, Color.LightSkyBlue);
-        Utility.DrawSquare(b, new(this.View.Left, this.View.Top + this.View.Height / 13 * 4, this.View.Width, this.View.Height / 3 * 2), 0, null, Color.LightBlue);
-        // sand
-        Utility.DrawSquare(b, new(this.View.Left, this.View.Top + this.View.Height / 3, this.View.Width, this.View.Height / 3 * 2), 0, null, Color.Orange);
+        {
+            position = this.View.Location.ToVector2();
+            source = new(0, 420, 240, 180);
+            Vector2 origin = source.Size.ToVector2() / 2;
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + origin * scale,
+                sourceRectangle: source,
+                color: colour,
+                rotation: 0,
+                origin: origin,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // DEBUG: road
         if (ModEntry.Debug)
         {
