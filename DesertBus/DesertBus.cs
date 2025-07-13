@@ -152,6 +152,8 @@ public class Game : IMinigame
             };
         }
 
+        // noise
+        Game1.stopMusicTrack(MusicContext.Default);
         Game1.playSound("roadnoise", out Game.RoadNoise);
         if (Game.RoadNoise is not null)
         {
