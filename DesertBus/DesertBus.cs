@@ -533,7 +533,7 @@ public class Game : IMinigame
             {
                 Farmer player = Game1.player;
                 position += new Vector2(16, -3) * scale;
-                player.FarmerRenderer.drawMiniPortrat(b, position + shake * 1.125f, 1, scale, Game1.down, player, alpha: 0.85f);
+                player.FarmerRenderer.drawMiniPortrat(b, position + shake * 1.125f, 1, scale, Game1.down, player, alpha: 0.75f);
             }
         }
         // driver photo
