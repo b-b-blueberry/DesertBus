@@ -1104,7 +1104,7 @@ public class Clock
     {
         char c = Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0 ? ' ' : ':';
         string text = $"{DateTime.Now.Hour:00}{c}{DateTime.Now.Minute:00}";
-        Color colour = Color.SpringGreen * alpha;
+        Color colour = Color.SpringGreen * 0.95f * alpha;
 
         // DEBUG: backboard
         {
