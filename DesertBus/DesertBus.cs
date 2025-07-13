@@ -1240,7 +1240,7 @@ public class Decor : IPooled
             texture: Game.Sprites,
             position: position,
             sourceRectangle: source,
-            color: Color.White,
+            color: Color.White * (float)(this.Distance * 50),
             rotation: 0,
             origin: source.Size.ToVector2() / 2,
             scale: scale,
