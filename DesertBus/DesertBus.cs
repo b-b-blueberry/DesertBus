@@ -97,6 +97,7 @@ public class Game : IMinigame
     public int Fade;
     public bool Quit;
 
+    public bool CanEnd => this.Success || this.Failure;
     public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
     public bool Failure => this.Speed <= 0 && this.FailTimer >= this.Rules.FailTime;
 
@@ -948,12 +949,12 @@ public class Game : IMinigame
             this.Opacity = (float)Math.Clamp(this.Opacity + this.Fade * 0.25d / ms, 0, 1);
         }
         // end game
-        if (this.Failure && this.EndGameTimer > 0)
+        if (this.CanEnd && this.EndGameTimer > 0)
         {
             this.EndGameTimer = Math.Max(this.EndGameTimer - ms, 0);
         }
         // quit
-        if (this.Success || this.Failure)
+        if (this.CanEnd)
         {
             // well done!
             this.Quit = true;
