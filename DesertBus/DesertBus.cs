@@ -797,7 +797,7 @@ public class Game : IMinigame
         }
         // accelerator (fake)
         {
-            this.AcceleratorTimer = Math.Clamp(this.AcceleratorTimer + 1d / ms / 100d * (this.Accelerator ? 1 : -1), 0d, 1d);
+            this.AcceleratorTimer = Math.Clamp(this.AcceleratorTimer + 1d / ms / 100d * (this.Accelerator ? 1 : -3), 0d, 1d);
         }
         // odometer
         {
