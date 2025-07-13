@@ -85,6 +85,11 @@ public class ModEntry : Mod
 
     public static void TryStartGame(string from, string to, bool test = false)
     {
+        if (Game1.currentMinigame is Game currentGame)
+        {
+            currentGame.unload();
+        }
+
         GameLocation location = Game1.getLocationFromName(from) ?? Game1.currentLocation;
         Farmer player = Game1.player;
         NPC pam = ModEntry.Pam;
@@ -100,7 +105,7 @@ public class ModEntry : Mod
 
         if (rules is not null)
         {
-            GameState state = new GameState()
+            GameState state = new()
             {
                 PlayerID = id,
                 PlayerName = name,
@@ -108,7 +113,7 @@ public class ModEntry : Mod
                 To = rules.To,
                 Position = rules.Width / 4
             };
-            Game game = new Game(data, rules, state);
+            Game game = new(data, rules, state);
             Game1.currentMinigame = game;
             ModEntry.State.Value.Game = game;
         }
