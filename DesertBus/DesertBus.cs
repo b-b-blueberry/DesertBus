@@ -94,6 +94,7 @@ public class Game : IMinigame
     public double FailTimer;
     public double EndGameTimer;
 
+    public bool Night;
     public int Fade;
     public bool Quit;
 
@@ -105,9 +106,11 @@ public class Game : IMinigame
 
     public event OnEndDelegate OnEnd;
 
-    public Game(GameData data, GameRules rules, GameState state)
+    public Game(GameData data, GameRules rules, GameState state, GameLocation location)
     {
-        Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/sprites.png");
+        this.Night = Game1.isDarkOut(location);
+        string path = this.Night ? "assets/sprites-night.png" : "assets/sprites.png";
+        Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(path);
 
         Game.Sprites = sprites;
         this.basicEffect = new(Game1.graphics.GraphicsDevice);
@@ -389,7 +392,7 @@ public class Game : IMinigame
                 viewToVertex(top),
                 viewToVertex(right),
             ];
-            var triangles = vertices.Select(v => new VertexPositionColor(v, new(95, 90, 95))).ToArray();
+            var triangles = vertices.Select(v => new VertexPositionColor(v, this.Night ? new(20,15,25) : new(95, 90, 95))).ToArray();
 
             const int num = 12;
             for (int i = 0; i < num; ++i)

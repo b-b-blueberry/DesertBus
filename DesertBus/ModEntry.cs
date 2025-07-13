@@ -131,7 +131,7 @@ public class ModEntry : Mod
                 To = rules.To,
                 Position = rules.Width / 4
             };
-            Game game = new(data, rules, state);
+            Game game = new(data, rules, state, location);
             game.OnEnd += onEnd;
             Game1.currentMinigame = game;
             ModEntry.State.Value.Game = game;
