@@ -477,22 +477,30 @@ public class Game : IMinigame
                 layerDepth: 1);
         }
         // engine lights
-        if (false)
         {
             if (this.EngineTimer > 0 || this.Failure)
             {
-                position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(28, -50) * scale;
-                source = new(0, 207, 45, 9);
-                b.Draw(
-                    texture: Game.Sprites,
-                    position: position + shake,
-                    sourceRectangle: source,
-                    color: colour,
-                    rotation: 0,
-                    origin: Vector2.Zero,
-                    scale: scale,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1);
+                position = new Vector2(this.View.Left, this.View.Bottom);
+                List<(Vector2, Rectangle)> lights = [
+                    (new(-4, -22), new(0, 207, 9, 9)), // battery on revometer
+                    (new(27, -20), new(9, 207, 9, 9)), // fuel on fullo'fuelometer
+                    (new(93, -22), new(18, 207, 9, 9)), // engine on speedometer
+                    //(new(0, 0), new(27, 207, 9, 9)), // oil on ????
+                    (new(63, -20), new(35, 207, 9, 9)), // temp on thermometer
+                ];
+                foreach ((Vector2 v, Rectangle r) in lights)
+                {
+                    b.Draw(
+                        texture: Game.Sprites,
+                        position: position + v * scale + shake,
+                        sourceRectangle: r,
+                        color: colour * 0.75f,
+                        rotation: 0,
+                        origin: Vector2.Zero,
+                        scale: scale,
+                        effects: SpriteEffects.None,
+                        layerDepth: 1);
+                }
             }
         }
         // scent tree
