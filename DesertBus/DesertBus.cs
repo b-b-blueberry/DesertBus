@@ -85,6 +85,9 @@ public class Game : IMinigame
     public double WheelSpeed;
     public double WheelRotation;
 
+    public bool Brake;
+    public bool Accelerator;
+    public double AcceleratorTimer;
     public bool EngineOn;
     public double EngineTimer;
 
@@ -519,7 +522,8 @@ public class Game : IMinigame
             double startRotation = Math.PI * 1.25d; // 6 o'clock
             double addedRotation = Math.Max(0, this.Speed / 100d * Math.PI * 0.5d // increase with speed
                 + 0.75d * Math.Abs(Math.Sin(this.Speed / 10)) * Math.PI // pretend we're changing gears
-                - this.FailTimer / this.Rules.FailTime * Math.PI / 5d); // choke on dirt
+                - this.FailTimer / this.Rules.FailTime * Math.PI / 5d) // choke on dirt
+                 * this.AcceleratorTimer; // only spool up when accelerating
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(0, -27f) * scale;
             source = new Rectangle(324, 477, 7, 19);
             b.Draw(
@@ -728,14 +732,19 @@ public class Game : IMinigame
         bool isOffRoad = this.Rules.Width > 0 && Math.Abs(this.State.Position) > this.Rules.Width / 2;
         bool isOutOfBounds = isOffRoad && Math.Abs(this.State.Position) >= this.Rules.Width;
 
+        // input
+        {
+            this.Brake = !this.Failure && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton);
+            this.Accelerator = !this.Failure && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton);
+        }
         // speed
         if (!this.Failure)
         {
             double force = this.Rules.Deceleration * (1 + 2 * this.FailTimer / this.Rules.FailTime);
 
-            if (Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton))
+            if (this.Brake)
                 force += this.Rules.Braking;
-            else if (!isOffRoad && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton))
+            else if (!isOffRoad && this.Accelerator)
                 force += this.Rules.Acceleration * (1 - this.FailTimer / this.Rules.FailTime);
 
             this.Speed = Math.Clamp(this.Speed + force / ms, 0, this.Rules.MaxSpeed);
@@ -786,6 +795,10 @@ public class Game : IMinigame
         {
             this.Shake = Vector2.Zero;
         }
+        // accelerator (fake)
+        {
+            this.AcceleratorTimer = Math.Clamp(this.AcceleratorTimer + 1d / ms / 100d * (this.Accelerator ? 1 : -1), 0d, 1d);
+        }
         // odometer
         {
             this.Odometer.Update(ms, this.State.Distance);
@@ -801,7 +814,7 @@ public class Game : IMinigame
         }
         if (Game.RoadNoise is not null)
         {
-            double volume = this.Speed / this.Rules.MaxSpeed * 20 + 80;
+            double volume = this.Speed / this.Rules.MaxSpeed * this.AcceleratorTimer * 20 + 80;
             Game.RoadNoise.SetVariable("Volume", (int)volume);
         }
         if (Game.EngineNoise is not null)
