@@ -878,6 +878,10 @@ public class Game : IMinigame
         {
             this.Engine();
         }
+        if (this.Failure)
+        {
+            this.EngineOn = false;
+        }
         if (this.EngineTimer > 0)
         {
             this.EngineTimer = Math.Max(this.EngineTimer - ms, 0);
