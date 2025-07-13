@@ -215,7 +215,10 @@ public class Game : IMinigame
 
     public void Doors()
     {
-        Game1.playSound("trashcanlid", pitch: this.DoorsOpen > 0 ? 100 : 0);
+        if (this.DoorsOpen > 0)
+            Game1.playSound("trashcanlid", pitch: 0);
+        else
+            Game1.playSound("doorCreakReverse", pitch: 0);
         this.DoorsOpen *= -1;
     }
 
