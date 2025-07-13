@@ -21,9 +21,9 @@ public class GameRules
     public string From = null;
     public string To = null;
     // bus model
-    public int Speed = 35;
+    public int Speed = 0;
     public int MaxSpeed = 70;
-    public double Acceleration = 1.5d;
+    public double Acceleration = 5d;
     public double Deceleration = -0.666d;
     public double Braking = -7.5d;
     public double SteeringLimit = 1.0d;
@@ -147,7 +147,7 @@ public class Game : IMinigame
             decor.Position = 0.01d;
             decor.Distance = 0.3d;
             decor.Sprites = new Dictionary<float, Rectangle>{
-                {0f, new(323, 477, 9, 19)},
+                {0f, new(144, 300, 16, 48)},
             };
         }
 
@@ -180,19 +180,54 @@ public class Game : IMinigame
         decor.Position = Game1.random.NextDouble() - 0.5d;
         decor.Distance = randomY ? Game1.random.NextDouble() * 0.25d : 0d;
         if (0d < decor.Position && decor.Position < 0.05d && this.State.Distance % 10 == 0)
+        {
             // sign
             decor.Sprites = new Dictionary<float, Rectangle>{
-                {0.3f, new(323, 477, 9, 19)},
-                {0.1f, new(362, 395, 7, 13)},
-                {0f, new(375, 404, 4, 4)},
+                {0.25f, new(144, 300, 16, 48)},
+                {0.2f, new(128, 300, 16, 48)},
+                {0.1f, new(112, 300, 16, 48)},
+                {0.05f, new(96, 300, 16, 48)},
+                {0f, new(80, 300, 16, 48)},
             };
-        else
-            // bush
+        }
+        else if (Game1.random.NextDouble() < 0.05d)
+        {
+            // cactus
             decor.Sprites = new Dictionary<float, Rectangle>{
-                {0.3f, new(71, 1931, 21, 21)},
-                {0.1f, new(137, 412, 10, 11)},
-                {0f, new(433, 451, 3, 3)},
+                {0.25f, new(144, 348, 16, 32)},
+                {0.2f, new(128, 348, 16, 32)},
+                {0.1f, new(112, 348, 16, 32)},
+                {0.05f, new(96, 348, 16, 32)},
+                {0f, new(80, 348, 16, 32)},
             };
+        }
+        else
+        {
+            // brush
+            Dictionary<float, Rectangle>[] sprites = [
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(192, 300, 16, 16)},
+                    {0.1f, new(176, 300, 16, 16)},
+                    {0f, new(160, 300, 16, 16)},
+                },
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(192, 316, 16, 16)},
+                    {0.1f, new(176, 316, 16, 16)},
+                    {0f, new(160, 316, 16, 16)},
+                },
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(192, 332, 16, 24)},
+                    {0.1f, new(176, 332, 16, 24)},
+                    {0f, new(160, 332, 16, 24)},
+                },
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(192, 356, 16, 24)},
+                    {0.1f, new(176, 356, 16, 24)},
+                    {0f, new(160, 356, 16, 24)},
+                }
+            ];
+            decor.Sprites = sprites[Game1.random.Next(sprites.Length)];
+        }
     }
 
     public void Engine()
@@ -436,6 +471,24 @@ public class Game : IMinigame
                     layerDepth: 1);
             }
         }
+        // scent tree
+        {
+            const int numFrames = 5;
+            int frame = numFrames - 1 - ((int)(numFrames * Math.Abs(Math.Sin(this.State.Distance / 50d))));
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(182, 50) * scale;
+            source = new Rectangle(0, 380, 24, 40);
+            source.X += source.Width * frame;
+            b.Draw(
+                texture: Game.Sprites,
+                position: position + shake * 1.5f,
+                color: colour,
+                sourceRectangle: source,
+                rotation: 0,
+                origin: Vector2.Zero,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+        }
         // mirror
         {
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 37) * scale;
@@ -625,24 +678,6 @@ public class Game : IMinigame
                 color: colour,
                 rotation: (float)(wheelRotation),
                 origin: source.Size.ToVector2() / 2,
-                scale: scale,
-                effects: SpriteEffects.None,
-                layerDepth: 1);
-        }
-        // scent tree
-        {
-            const int numFrames = 8;
-            int frame = (numFrames + (int)(3 * numFrames * Math.Sin(this.State.Distance / 35d)) % numFrames) / 2;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(184, 53) * scale;
-            source = new Rectangle(368, 16, 16, 16);
-            source.X += source.Width * frame;
-            b.Draw(
-                texture: Game1.mouseCursors,
-                position: position + shake * 1.5f,
-                color: colour,
-                sourceRectangle: source,
-                rotation: 0,
-                origin: Vector2.Zero,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -1166,7 +1201,7 @@ public class Decor : IPooled
         Rectangle source = this.Sprites.FirstOrDefault(pair => pair.Key < this.Distance).Value;
 
         b.Draw(
-            texture: Game1.mouseCursors,
+            texture: Game.Sprites,
             position: position,
             sourceRectangle: source,
             color: Color.White,
