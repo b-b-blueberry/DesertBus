@@ -208,6 +208,13 @@ public class Game : IMinigame
                     {0.05f, new(240, 316, 16, 16)},
                     {0f, new(224, 316, 16, 16)},
                 },
+                // crazy castle
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(256, 380, 32, 32)},
+                    {0.125f, new(224, 380, 32, 32)},
+                    {0.05f, new(192, 380, 32, 32)},
+                    {0f, new(160, 380, 32, 32)},
+                },
             ];
             decor.Sprites = sprites[Game1.random.Next(sprites.Length)];
         }
