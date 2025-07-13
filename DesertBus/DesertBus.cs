@@ -1196,7 +1196,7 @@ public class Decor : IPooled
         if (this.IsOffscreen)
             return;
 
-        if (this.Distance >= 0.5d)
+        if (this.Distance >= 0.666d)
             this.IsOffscreen = true;
 
         this.Distance += speed / ms / 2000d * (1 - Math.Abs(this.Position));
