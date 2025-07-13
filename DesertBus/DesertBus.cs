@@ -199,9 +199,9 @@ public class Game : IMinigame
         }
         else if (Game1.random.NextDouble() < 0.2d)
         {
-            // cactus
+            // greenery
             Dictionary<float, Rectangle>[] sprites = [
-                // tall
+                // cactus
                 new Dictionary<float, Rectangle>{
                     {0.25f, new(144, 348, 16, 32)},
                     {0.15f, new(128, 348, 16, 32)},
@@ -215,6 +215,14 @@ public class Game : IMinigame
                     {0.125f, new(256, 300, 16, 16)},
                     {0.05f, new(240, 300, 16, 16)},
                     {0f, new(224, 300, 16, 16)},
+                },
+                // just some grass
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(64, 332, 16, 16)},
+                    {0.15f, new(48, 332, 16, 16)},
+                    {0.075f, new(32, 332, 16, 16)},
+                    {0.05f, new(16, 332, 16, 16)},
+                    {0f, new(0, 332, 16, 16)},
                 },
             ];
             decor.Sprites = sprites[Game1.random.Next(sprites.Length)];
