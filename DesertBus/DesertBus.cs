@@ -184,9 +184,9 @@ public class Game : IMinigame
             // sign
             decor.Sprites = new Dictionary<float, Rectangle>{
                 {0.25f, new(144, 300, 16, 48)},
-                {0.2f, new(128, 300, 16, 48)},
-                {0.1f, new(112, 300, 16, 48)},
-                {0.05f, new(96, 300, 16, 48)},
+                {0.15f, new(128, 300, 16, 48)},
+                {0.075f, new(112, 300, 16, 48)},
+                {0.025f, new(96, 300, 16, 48)},
                 {0f, new(80, 300, 16, 48)},
             };
         }
@@ -195,9 +195,9 @@ public class Game : IMinigame
             // cactus
             decor.Sprites = new Dictionary<float, Rectangle>{
                 {0.25f, new(144, 348, 16, 32)},
-                {0.2f, new(128, 348, 16, 32)},
-                {0.1f, new(112, 348, 16, 32)},
-                {0.05f, new(96, 348, 16, 32)},
+                {0.15f, new(128, 348, 16, 32)},
+                {0.075f, new(112, 348, 16, 32)},
+                {0.025f, new(96, 348, 16, 32)},
                 {0f, new(80, 348, 16, 32)},
             };
         }
@@ -206,23 +206,27 @@ public class Game : IMinigame
             // brush
             Dictionary<float, Rectangle>[] sprites = [
                 new Dictionary<float, Rectangle>{
-                    {0.25f, new(192, 300, 16, 16)},
-                    {0.1f, new(176, 300, 16, 16)},
+                    {0.25f, new(208, 300, 16, 16)},
+                    {0.125f, new(192, 300, 16, 16)},
+                    {0.05f, new(176, 300, 16, 16)},
                     {0f, new(160, 300, 16, 16)},
                 },
                 new Dictionary<float, Rectangle>{
-                    {0.25f, new(192, 316, 16, 16)},
-                    {0.1f, new(176, 316, 16, 16)},
+                    {0.25f, new(208, 316, 16, 16)},
+                    {0.125f, new(192, 316, 16, 16)},
+                    {0.05f, new(176, 316, 16, 16)},
                     {0f, new(160, 316, 16, 16)},
                 },
                 new Dictionary<float, Rectangle>{
-                    {0.25f, new(192, 332, 16, 24)},
-                    {0.1f, new(176, 332, 16, 24)},
+                    {0.25f, new(208, 332, 16, 24)},
+                    {0.125f, new(192, 332, 16, 24)},
+                    {0.05f, new(176, 332, 16, 24)},
                     {0f, new(160, 332, 16, 24)},
                 },
                 new Dictionary<float, Rectangle>{
-                    {0.25f, new(192, 356, 16, 24)},
-                    {0.1f, new(176, 356, 16, 24)},
+                    {0.25f, new(208, 356, 16, 24)},
+                    {0.125f, new(192, 356, 16, 24)},
+                    {0.05f, new(176, 356, 16, 24)},
                     {0f, new(160, 356, 16, 24)},
                 }
             ];
