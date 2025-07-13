@@ -28,7 +28,6 @@ public class ModEntry : Mod
 
     public static ModEntry Instance { get; private set; }
     public static ModConfig Config { get; private set; }
-    public static ITranslationHelper I18n => ModEntry.Instance.Helper.Translation;
     public static PerScreen<ModState> State { get; private set; }
     public static NPC Pam => Game1.getCharacterFromName("Pam");
 

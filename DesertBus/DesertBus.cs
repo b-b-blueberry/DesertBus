@@ -617,7 +617,7 @@ public class Game : IMinigame
             SpriteFont font = Game1.smallFont;
             const int length = 9;
 
-            text = ModEntry.I18n.Get("game.driver");
+            text = "YOUR DRIVER IS";
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(91, 12) * scale;
