@@ -25,7 +25,7 @@ public class GameRules
     public int MaxSpeed = 70;
     public double Acceleration = 1.5d;
     public double Deceleration = -0.666d;
-    public double Braking = -10.0d;
+    public double Braking = -7.5d;
     public double SteeringLimit = 1.0d;
     public double SteeringToWheel = 0.5d;
     public double SteeringToGround = 0.0075d;
