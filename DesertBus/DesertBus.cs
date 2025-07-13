@@ -21,9 +21,9 @@ public class GameRules
     public string From = null;
     public string To = null;
     // bus model
-    public int Speed = 0;
+    public int Speed = 35;
     public int MaxSpeed = 70;
-    public double Acceleration = 5d;
+    public double Acceleration = 1.5d;
     public double Deceleration = -0.666d;
     public double Braking = -7.5d;
     public double SteeringLimit = 1.0d;
