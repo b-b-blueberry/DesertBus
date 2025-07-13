@@ -450,6 +450,14 @@ public class Game : IMinigame
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
+
+            // you!!!
+            if (this.State.PlayerID == -1)
+            {
+                Farmer player = Game1.player;
+                position += new Vector2(16, -3) * scale;
+                player.FarmerRenderer.drawMiniPortrat(b, position + shake * 1.125f, 1, scale, Game1.down, player, alpha: 0.85f);
+            }
         }
         // driver photo
         {
