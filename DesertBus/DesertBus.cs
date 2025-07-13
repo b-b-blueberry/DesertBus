@@ -190,7 +190,7 @@ public class Game : IMinigame
                 {0f, new(80, 300, 16, 48)},
             };
         }
-        else if (Game1.random.NextDouble() < 0.05d)
+        else if (Game1.random.NextDouble() < 0.2d)
         {
             // cactus
             Dictionary<float, Rectangle>[] sprites = [
