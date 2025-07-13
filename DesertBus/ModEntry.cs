@@ -1,4 +1,4 @@
-﻿using HarmonyLib;
+﻿using HarmonyLib; // el diavolo
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
