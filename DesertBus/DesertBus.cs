@@ -590,7 +590,7 @@ public class Game : IMinigame
         // steering
         {
             // column
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -4) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -6) * scale;
             source = new Rectangle(172, 200, 23, 57);
             b.Draw(
                 texture: Game.Sprites,
@@ -605,7 +605,7 @@ public class Game : IMinigame
 
             // wheel
             double wheelRotation = this.WheelRotation;
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -28) * scale;
+            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -30) * scale;
             source = new Rectangle(200, 200, 100, 100);
             b.Draw(
                 texture: Game.Sprites,
