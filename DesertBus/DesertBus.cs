@@ -193,13 +193,24 @@ public class Game : IMinigame
         else if (Game1.random.NextDouble() < 0.05d)
         {
             // cactus
-            decor.Sprites = new Dictionary<float, Rectangle>{
-                {0.25f, new(144, 348, 16, 32)},
-                {0.15f, new(128, 348, 16, 32)},
-                {0.075f, new(112, 348, 16, 32)},
-                {0.025f, new(96, 348, 16, 32)},
-                {0f, new(80, 348, 16, 32)},
-            };
+            Dictionary<float, Rectangle>[] sprites = [
+                // tall
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(144, 348, 16, 32)},
+                    {0.15f, new(128, 348, 16, 32)},
+                    {0.075f, new(112, 348, 16, 32)},
+                    {0.025f, new(96, 348, 16, 32)},
+                    {0f, new(80, 348, 16, 32)},
+                },
+                // prickly pear
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(272, 300, 16, 16)},
+                    {0.125f, new(256, 300, 16, 16)},
+                    {0.05f, new(240, 300, 16, 16)},
+                    {0f, new(224, 300, 16, 16)},
+                },
+            ];
+            decor.Sprites = sprites[Game1.random.Next(sprites.Length)];
         }
         else
         {
