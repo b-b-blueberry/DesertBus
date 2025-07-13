@@ -439,7 +439,7 @@ public class Game : IMinigame
         // mirror
         {
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 37) * scale;
-            source = new(0, 300, 80, 34);
+            source = new(0, 300, 80, 32);
             b.Draw(
                 texture: Game.Sprites,
                 position: position + shake * 1.125f,
@@ -457,7 +457,7 @@ public class Game : IMinigame
             if (this.State.PlayerID != -1)
             {
                 Farmer player = Game1.player;
-                position += new Vector2(47, 10) * scale;
+                position += new Vector2(51, 10) * scale;
                 player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player);
             }
             else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
@@ -471,7 +471,7 @@ public class Game : IMinigame
                 {
                     texture = npc.Sprite.Texture;
                 }
-                position += new Vector2(47, 3) * scale;
+                position += new Vector2(51, 3) * scale;
                 source = npc.getMugShotSourceRect();
                 b.Draw(texture, position + shake, source, Color.Lerp(colour, Color.Beige, 0.95f) * 0.85f, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
             }
@@ -487,7 +487,7 @@ public class Game : IMinigame
             text = ModEntry.I18n.Get("game.driver");
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
-            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(87, 12) * scale;
+            position = new Vector2(this.View.Left, this.View.Top) + new Vector2(91, 12) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
 
             text = this.State.PlayerName.ToUpper();
