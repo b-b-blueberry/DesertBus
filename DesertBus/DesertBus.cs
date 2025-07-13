@@ -574,6 +574,7 @@ public class Game : IMinigame
             string text;
             Vector2 textSize;
             float textScale;
+            Color textColour = new(50,15,30);
             SpriteFont font = Game1.smallFont;
             const int length = 9;
 
@@ -581,7 +582,7 @@ public class Game : IMinigame
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(91, 12) * scale;
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, textColour, textScale);
 
             text = this.State.PlayerName.ToUpper();
             if (text.Length > length)
@@ -589,7 +590,7 @@ public class Game : IMinigame
             textSize = font.MeasureString(text);
             textScale = scale * 0.333f;
             position += new Vector2(0, 10) * scale;
-            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, Color.Black, textScale);
+            Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, textColour, textScale);
         }
         // chronometer
         {
