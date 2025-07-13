@@ -197,6 +197,20 @@ public class Game : IMinigame
                 {0f, new(80, 300, 16, 48)},
             };
         }
+        else if (Game1.random.NextDouble() < 0.05d)
+        {
+            // rare bits
+            Dictionary<float, Rectangle>[] sprites = [
+                // jones bones
+                new Dictionary<float, Rectangle>{
+                    {0.25f, new(272, 316, 16, 16)},
+                    {0.125f, new(256, 316, 16, 16)},
+                    {0.05f, new(240, 316, 16, 16)},
+                    {0f, new(224, 316, 16, 16)},
+                },
+            ];
+            decor.Sprites = sprites[Game1.random.Next(sprites.Length)];
+        }
         else if (Game1.random.NextDouble() < 0.2d)
         {
             // greenery
