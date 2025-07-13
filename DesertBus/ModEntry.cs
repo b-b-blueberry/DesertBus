@@ -1,15 +1,18 @@
-﻿using StardewModdingAPI;
+﻿using HarmonyLib;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Delegates;
 using StardewValley.Locations;
+using StardewValley.Minigames;
 
 namespace DesertBus;
 
 public class ModConfig
 {
     public bool Intro { get; set; } = true;
+    public bool AbigailGame { get; set; } = true;
 }
 
 public class ModState
@@ -42,6 +45,10 @@ public class ModEntry : Mod
         helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true));
 
         GameStateQuery.Register(ModEntry.GSQ_ID, (string[] query, GameStateQueryContext context) => ModEntry.CanDriveTheBus(context.Player, context.Location));
+
+        // evil doings
+        Harmony harmony = new(id: this.Helper.ModRegistry.ModID);
+        harmony.PatchAll();
     }
 
     public void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -128,6 +135,32 @@ public class ModEntry : Mod
             game.OnEnd += onEnd;
             Game1.currentMinigame = game;
             ModEntry.State.Value.Game = game;
+        }
+    }
+}
+
+[HarmonyPatch]
+public static class HarmonyPatches
+{
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Event.DefaultCommands))]
+    [HarmonyPatch(nameof(Event.DefaultCommands.Cutscene))]
+    public static void EventCommands_Cutscene_Postfix(Event @event, string[] args, EventContext context)
+    {
+        // go on. get your precious hearts. i'll wait
+        if (ModEntry.Config.AbigailGame && Game1.currentMinigame is AbigailGame)
+        {
+            ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true, success =>
+            {
+                if (Game1.currentLocation.currentEvent is Event e)
+                {
+                    e.CurrentCommand++;
+                    if (success)
+                    {
+                        e.specialEventVariable1 = true;
+                    }
+                }
+            });
         }
     }
 }
