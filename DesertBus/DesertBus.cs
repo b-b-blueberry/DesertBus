@@ -389,9 +389,9 @@ public class Game : IMinigame
 
             Vector3[] vertices = [];
             VertexPositionColor[] triangles = [
-                new (viewToVertex(left), this.Night ? new(20,15,25) : new(95, 90, 95)),
-                new (viewToVertex(top), this.Night ? new(20,15,25) : new Color(105, 95, 85) * 0.975f),
-                new (viewToVertex(right), this.Night ? new(20,15,25) : new(95, 90, 95)),
+                new (viewToVertex(left), this.Night ? new(10,5,10) : new(95, 90, 95)),
+                new (viewToVertex(top), this.Night ? new(2,1,2) : new Color(105, 95, 85) * 0.975f),
+                new (viewToVertex(right), this.Night ? new(10,5,10) : new(95, 90, 95)),
             ];
 
             const int num = 12;
@@ -403,6 +403,7 @@ public class Game : IMinigame
                 double t = (value + d * rate) % rate / rate;
                 float ratio = (float)Math.Pow(t, 2);
                 Vector2 size = new(0.025f, 0.019f);
+                Color stripeColour = this.Night ? Color.Lerp(Color.Black, new Color(245, 185, 0), ratio * ratio) : new Color(245, 185, 0);
 
                 float ratioT = Math.Max(0, ratio - size.Y * 4 * ratio) * ratio;
                 float ratioB = Math.Max(0, ratio + size.Y * 4 * ratio) * ratio;
@@ -427,7 +428,7 @@ public class Game : IMinigame
                     viewToVertex(lerpTL), // TL
                     viewToVertex(lerpTR), // TR
                 ];
-                triangles = triangles.Concat(vertices.Select(v => new VertexPositionColor(v, new Color(245, 185, 0) * 0.975f))).ToArray();
+                triangles = triangles.Concat(vertices.Select(v => new VertexPositionColor(v, stripeColour * 0.975f))).ToArray();
             }
 
             foreach (EffectPass pass in this.basicEffect.CurrentTechnique.Passes)
@@ -466,11 +467,11 @@ public class Game : IMinigame
             {
                 position = new Vector2(this.View.Left + this.View.Width * 0.3f, this.View.Top + this.View.Height * 0.4f);
                 source = new(512 + 16 * (int)this.BugSplat, 1696, 16, 16);
-                b.Draw(
+                b.Draw( 
                     texture: Game1.mouseCursors,
                     position: position + shake,
                     sourceRectangle: source,
-                    color: colour,
+                    color: this.Night ? Color.Lerp(colour, Color.Black, 0.825f) : colour,
                     rotation: 0,
                     origin: Vector2.Zero,
                     scale: scale,
@@ -496,7 +497,7 @@ public class Game : IMinigame
         // odometer
         {
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(165, -23) * scale;
-            this.Odometer.Draw(b, position + shake, scale, alpha);
+            this.Odometer.Draw(b, position + shake, scale, alpha, this.Night ? new(75,85,75) : Color.White);
         }
         // bus dashboard
         {
@@ -590,7 +591,7 @@ public class Game : IMinigame
             {
                 Farmer player = Game1.player;
                 position += new Vector2(51, 12) * scale;
-                player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player, 0.8f);
+                player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player, this.Night ? 0.25f : 0.8f);
             }
             else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
             {
@@ -613,7 +614,7 @@ public class Game : IMinigame
             string text;
             Vector2 textSize;
             float textScale;
-            Color textColour = new(50,15,30);
+            Color textColour = this.Night ? new(12,7,12) : new(50,15,30);
             SpriteFont font = Game1.smallFont;
             const int length = 9;
 
@@ -1138,7 +1139,7 @@ public class Odometer
         }
     }
 
-    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha)
+    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha, Color colour)
     {
         // DEBUG: backboard
         {
@@ -1151,7 +1152,7 @@ public class Odometer
             drawSize = Digits.Slice.Size.ToVector2() * scale;
             drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
             drawArea = new Rectangle(drawPosition.ToPoint(), drawSize.ToPoint());
-            Utility.DrawSquare(b, drawArea, 0, null, Color.White);
+            Utility.DrawSquare(b, drawArea, 0, null, colour);
         }
 
         // digits
@@ -1161,10 +1162,10 @@ public class Odometer
             uint digit = (uint)digits[i] - '0';
             uint below = ((digit + 1) % 10);
             float offset = (this.Offsets[i]) * scale;
-            Color colour = (i == digits.Length - 1 ? Color.Black : Color.White) * alpha;
+            Color digitColour = (i == digits.Length - 1 ? Color.Black : Color.White) * alpha;
 
-            Digits.draw(b, digit, position + new Vector2(0, offset), scale, colour);
-            Digits.draw(b, below, position + new Vector2(0, offset + Digits.Slice.Height * scale), scale, colour);
+            Digits.draw(b, digit, position + new Vector2(0, offset), scale, digitColour);
+            Digits.draw(b, below, position + new Vector2(0, offset + Digits.Slice.Height * scale), scale, digitColour);
             position -= new Vector2(Digits.Slice.Width * scale, 0);
         }
     }
