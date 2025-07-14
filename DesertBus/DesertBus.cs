@@ -589,7 +589,7 @@ public class Game : IMinigame
             if (this.State.PlayerID != -1)
             {
                 Farmer player = Game1.player;
-                position += new Vector2(51, 10) * scale;
+                position += new Vector2(51, 12) * scale;
                 player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player, 0.8f);
             }
             else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
