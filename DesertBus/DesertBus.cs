@@ -386,16 +386,15 @@ public class Game : IMinigame
 
         // BACKGROUND
         {
-            position = this.View.Location.ToVector2();
-            source = new(0, 420, 240, 180);
-            Vector2 origin = source.Size.ToVector2() / 2;
+            position = this.View.Center.ToVector2();
+            source = new(0, 420, 270, 180);
             b.Draw(
                 texture: Game.Sprites,
-                position: position + origin * scale,
+                position: position + new Vector2(median, 0) * scale,
                 sourceRectangle: source,
                 color: colour,
                 rotation: 0,
-                origin: origin,
+                origin: source.Size.ToVector2() / 2,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
