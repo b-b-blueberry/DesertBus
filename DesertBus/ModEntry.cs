@@ -26,6 +26,7 @@ public class ModEntry : Mod
     public static readonly string GSQ_ID = "BLUEBERRY_DESERT_BUS_AVAILABLE";
 
     public static string MINIGAME_ID => $"{ModEntry.Instance.ModManifest.UniqueID}.Game";
+    public static string STATS_ID => $"{ModEntry.Instance.ModManifest.UniqueID}";
 
     public static ModEntry Instance { get; private set; }
     public static ModConfig Config { get; private set; }

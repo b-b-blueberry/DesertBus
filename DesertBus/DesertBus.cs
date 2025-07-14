@@ -928,6 +928,18 @@ public class Game : IMinigame
 
             Game1.globalFadeToClear();
 
+            // update player stats
+            Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Distance", (uint)this.State.Distance);
+            Game1.player.stats.Set($"{ModEntry.STATS_ID}.MaxDistance", Math.Max(Game1.player.stats.Get($"{ModEntry.STATS_ID}.MaxDistance"), (uint)this.State.Distance));
+            if (this.Success)
+            {
+                Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Success");
+            }
+            else if (this.Failure)
+            {
+                Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Failure");
+            }
+
             return true;
         }
         return false;
