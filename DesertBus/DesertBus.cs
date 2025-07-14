@@ -356,12 +356,6 @@ public class Game : IMinigame
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
-        // DEBUG: road
-        if (ModEntry.Debug)
-        {
-            int median1 = -(int)this.State.Position;
-            Utility.drawLineWithScreenCoordinates(this.View.Center.X + median1, this.View.Top, this.View.Center.X + median1, this.View.Bottom, b, Color.Black, 1, 1);
-        }
 
         b.End();
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
@@ -755,83 +749,10 @@ public class Game : IMinigame
                 effects: SpriteEffects.None,
                 layerDepth: 1);
         }
-        // DEBUG: speedometer
-        if (ModEntry.Debug)
-        {
-            int speed = (int)(this.Speed);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(70, -12) * scale;
-            Utility.drawTinyDigits(
-                toDraw: speed,
-                b: b,
-                position: position + shake,
-                scale: scale,
-                layerDepth: 1,
-                c: Color.White);
-        }
-        // DEBUG: odometer
-        if (ModEntry.Debug)
-        {
-            int distance = (int)(this.State.Distance / 1000d);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(106, -12) * scale;
-            Utility.drawTinyDigits(
-                toDraw: distance,
-                b: b,
-                position: position + shake,
-                scale: scale,
-                layerDepth: 1,
-                c: Color.White);
-        }
-        // DEBUG: positionometer
-        if (ModEntry.Debug)
-        {
-            position = new Vector2(this.View.Right, this.View.Bottom) + new Vector2(-16, -16) * scale;
-            Utility.drawTextWithShadow(
-                b: b,
-                text: ((int)this.State.Position).ToString(),
-                font: Game1.smallFont,
-                position: position + shake,
-                color: Color.White,
-                shadowIntensity: 0);
-        }
-        // DEBUG: wheel rotation
-        if (ModEntry.Debug)
-        {
-            string text;
-            Vector2 textSize;
-            float textScale = scale * 0.25f;
-            SpriteFont font = Game1.smallFont;
-
-            text = $"{this.WheelRotation:00}";
-            textSize = font.MeasureString(text);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(16, -64) * scale - new Vector2(textSize.X, 0) * textScale;
-            Utility.drawTextWithShadow(
-                b: b,
-                text: text,
-                font: Game1.smallFont,
-                position: position + shake,
-                color: Color.Black,
-                scale: textScale,
-                shadowIntensity: 0);
-
-            text = $"{this.WheelSpeed:0.00}";
-            textSize = font.MeasureString(text);
-            position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(32, -64) * scale - new Vector2(textSize.X, 0) * textScale;
-            Utility.drawTextWithShadow(
-                b: b,
-                text: text,
-                font: Game1.smallFont,
-                position: position + shake,
-                color: Color.Black,
-                scale: textScale,
-                shadowIntensity: 0);
-        }
 
         // FADE
 
         Utility.DrawSquare(b, this.View, 0, null, Color.Black * (1 - this.Opacity));
-
-        // DEBUG: lose condition warning
-        //Utility.DrawSquare(b, this.View, 0, null, Color.Black * (float)(this.FailTimer / this.Rules.FailTime) * 0.5f);
 
         // MASK
 
@@ -1141,7 +1062,7 @@ public class Odometer
 
     public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha, Color colour)
     {
-        // DEBUG: backboard
+        // backboard
         {
             Vector2 drawSize = new Vector2(Digits.Slice.Width * this.Offsets.Length, Digits.Slice.Height) * scale;
             Vector2 drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
@@ -1179,7 +1100,7 @@ public class Clock
         string text = $"{DateTime.Now.Hour:00}{c}{DateTime.Now.Minute:00}";
         Color colour = Color.SpringGreen * 0.95f * alpha;
 
-        // DEBUG: backboard
+        // backboard
         {
             Vector2 drawSize = new Vector2(Digits.Slice.Width * text.Length, Digits.Slice.Height) * scale;
             Vector2 drawPosition = new Vector2(position.X - drawSize.X, position.Y - drawSize.Y);
