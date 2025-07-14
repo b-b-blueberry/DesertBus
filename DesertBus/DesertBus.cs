@@ -387,12 +387,12 @@ public class Game : IMinigame
             Vector2 centre = new(-0.25f + width / 2 + median, 0);
             Vector2 right = new(-0.25f + width + median, 0);
 
-            Vector3[] vertices = [
-                viewToVertex(left),
-                viewToVertex(top),
-                viewToVertex(right),
+            Vector3[] vertices = [];
+            VertexPositionColor[] triangles = [
+                new (viewToVertex(left), this.Night ? new(20,15,25) : new(95, 90, 95)),
+                new (viewToVertex(top), this.Night ? new(20,15,25) : new Color(105, 95, 85) * 0.975f),
+                new (viewToVertex(right), this.Night ? new(20,15,25) : new(95, 90, 95)),
             ];
-            var triangles = vertices.Select(v => new VertexPositionColor(v, this.Night ? new(20,15,25) : new(95, 90, 95))).ToArray();
 
             const int num = 12;
             for (int i = 0; i < num; ++i)
@@ -427,7 +427,7 @@ public class Game : IMinigame
                     viewToVertex(lerpTL), // TL
                     viewToVertex(lerpTR), // TR
                 ];
-                triangles = triangles.Concat(vertices.Select(v => new VertexPositionColor(v, new Color(245, 185, 0)))).ToArray();
+                triangles = triangles.Concat(vertices.Select(v => new VertexPositionColor(v, new Color(245, 185, 0) * 0.975f))).ToArray();
             }
 
             foreach (EffectPass pass in this.basicEffect.CurrentTechnique.Passes)
