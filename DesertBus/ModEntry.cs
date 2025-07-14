@@ -11,7 +11,6 @@ namespace DesertBus;
 
 public class ModConfig
 {
-    public bool Intro { get; set; } = true;
     public bool ArcadeGame { get; set; } = true;
     public bool AbigailGame { get; set; } = true;
 }
@@ -32,8 +31,6 @@ public class ModEntry : Mod
     public static ModConfig Config { get; private set; }
     public static PerScreen<ModState> State { get; private set; }
     public static NPC Pam => Game1.getCharacterFromName("Pam");
-
-    public const bool Debug = false;
 
     public override void Entry(IModHelper helper)
     {
