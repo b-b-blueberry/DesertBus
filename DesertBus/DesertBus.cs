@@ -966,20 +966,6 @@ public class Game : IMinigame
 
     public void receiveKeyPress(Keys k)
     {
-        // honk
-        if (Game1.options.journalButton.Any(key => key.key == k))
-        {
-            this.Honk();
-            return;
-        }
-
-        // doors
-        if (Game1.options.mapButton.Any(key => key.key == k))
-        {
-            this.Doors();
-            return;
-        }
-
         // quit
         if (k is Keys.Escape)
         {
