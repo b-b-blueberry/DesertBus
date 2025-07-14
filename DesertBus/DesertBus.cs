@@ -1000,6 +1000,7 @@ public class Game : IMinigame
         Game.StartNoise?.Stop(AudioStopOptions.Immediate);
         Game.EngineNoise?.Stop(AudioStopOptions.Immediate);
         Game.RoadNoise?.Stop(AudioStopOptions.Immediate);
+        Game.OffroadNoise?.Stop(AudioStopOptions.Immediate);
 
         Game1.stopMusicTrack(MusicContext.MiniGame);
 
