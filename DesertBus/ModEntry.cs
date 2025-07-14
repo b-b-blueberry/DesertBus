@@ -31,6 +31,7 @@ public class ModEntry : Mod
     public static ModConfig Config { get; private set; }
     public static PerScreen<ModState> State { get; private set; }
     public static NPC Pam => Game1.getCharacterFromName("Pam");
+    public static NPC Abigail => Game1.getCharacterFromName("Abigail");
 
     public override void Entry(IModHelper helper)
     {
@@ -40,7 +41,7 @@ public class ModEntry : Mod
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
         helper.Events.Player.Warped += this.OnWarped;
 
-        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true, logoTimer: 0));
+        helper.ConsoleCommands.Add("bbdb", "desert bus", (string s, string[] args) => ModEntry.TryStartGame(from: null, to: null, driver: Game1.player, defaultRules: true));
 
         GameStateQuery.Register(ModEntry.GSQ_ID, (string[] query, GameStateQueryContext context) => ModEntry.CanDriveTheBus(context.Player, context.Location));
 
@@ -61,7 +62,8 @@ public class ModEntry : Mod
 
         if (e.OldLocation != e.NewLocation)
         {
-            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, onEnd: success =>
+            Character driver = ModEntry.IsPamDriving(e.OldLocation) ? ModEntry.Pam : Game1.player;
+            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, driver: driver, onEnd: success =>
             {
                 if (success)
                 {
@@ -99,7 +101,7 @@ public class ModEntry : Mod
         return isBusReady && (isPamDriving || isPlayerDriving);
     }
 
-    public static void TryStartGame(string from, string to, bool forcePlayerToDrive = false, double logoTimer = 0, Game.OnEndDelegate onEnd = null)
+    public static void TryStartGame(string from, string to, Character driver, bool defaultRules = false, double logoTimer = -1000, Game.OnEndDelegate onEnd = null)
     {
         if (Game1.currentMinigame is Game currentGame)
         {
@@ -107,29 +109,19 @@ public class ModEntry : Mod
         }
 
         GameLocation location = Game1.getLocationFromName(from) ?? Game1.currentLocation;
-        Farmer player = Game1.player;
-        NPC pam = ModEntry.Pam;
-
-        GameStateQueryContext context = new(location, player, null, null, Game1.random);
+        GameStateQueryContext context = new(location, Game1.player, null, null, Game1.random);
         GameData data = ModEntry.Instance.Helper.ModContent.Load<GameData>("assets/data.json");
-        GameRules rules = forcePlayerToDrive ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
-
-        bool isPamDriving = !forcePlayerToDrive && ModEntry.IsPamDriving(location);
-
-        string name = isPamDriving ? pam.displayName : player.Name;
-        long id = isPamDriving ? -1 : player.UniqueMultiplayerID;
+        GameRules rules = defaultRules ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
 
         if (rules is not null)
         {
             GameState state = new()
             {
-                PlayerID = id,
-                PlayerName = name,
                 From = rules.From,
                 To = rules.To,
                 Position = rules.Width / 4
             };
-            Game game = new(data, rules, state, location, logoTimer);
+            Game game = new(data, rules, state, location, driver: driver, logoTimer);
             game.OnEnd += onEnd;
             Game1.currentMinigame = game;
             ModEntry.State.Value.Game = game;
@@ -148,7 +140,7 @@ public static class HarmonyPatches
         // the real journey of the prairie king
         if (ModEntry.Config.ArcadeGame)
         {
-            ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true, logoTimer: 3000, onEnd: success =>
+            ModEntry.TryStartGame(from: null, to: null, driver: Game1.player, defaultRules: true, logoTimer: 3000, onEnd: success =>
             {
                 // do nothing
             });
@@ -165,7 +157,7 @@ public static class HarmonyPatches
         // go on. get your precious hearts. i'll wait
         if (ModEntry.Config.AbigailGame && Game1.currentMinigame is AbigailGame)
         {
-            ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true, logoTimer: 3000, onEnd: success =>
+            ModEntry.TryStartGame(from: null, to: null, driver: ModEntry.Abigail, defaultRules: true, logoTimer: 3000, onEnd: success =>
             {
                 if (Game1.currentLocation.currentEvent is Event e)
                 {

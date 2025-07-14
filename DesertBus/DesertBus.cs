@@ -46,8 +46,6 @@ public class GameRules
 
 public class GameState
 {
-    public long PlayerID;
-    public string PlayerName;
     public string From;
     public string To;
     public double Position;
@@ -64,6 +62,8 @@ public class Game : IMinigame
     public static Texture2D Logo;
     public static Texture2D Sprites;
     public BasicEffect basicEffect;
+
+    public Character Driver;
 
     public GameData Data;
     public GameRules Rules;
@@ -113,7 +113,7 @@ public class Game : IMinigame
 
     public event OnEndDelegate OnEnd;
 
-    public Game(GameData data, GameRules rules, GameState state, GameLocation location, double logoTimer = -1000)
+    public Game(GameData data, GameRules rules, GameState state, GameLocation location, Character driver, double logoTimer = -1000)
     {
         this.Night = Game1.isDarkOut(location);
         string path = this.Night ? "assets/sprites-night.png" : "assets/sprites.png";
@@ -123,6 +123,8 @@ public class Game : IMinigame
         Game.Sprites = sprites;
         Game.Logo = logo;
         this.basicEffect = new(Game1.graphics.GraphicsDevice);
+
+        this.Driver = driver;
 
         this.Data = data;
         this.Rules = rules;
@@ -611,7 +613,7 @@ public class Game : IMinigame
                 layerDepth: 1);
 
             // you!!!
-            if (this.State.PlayerID == -1)
+            if (this.Driver is not Farmer)
             {
                 Farmer player = Game1.player;
                 position += new Vector2(16, -3) * scale;
@@ -621,13 +623,12 @@ public class Game : IMinigame
         // driver photo
         {
             position = new Vector2(this.View.Left, this.View.Top);
-            if (this.State.PlayerID != -1)
+            if (this.Driver is Farmer player)
             {
-                Farmer player = Game1.player;
                 position += new Vector2(51, 12) * scale;
                 player.FarmerRenderer.drawMiniPortrat(b, position + shake, 1, scale, Game1.down, player, this.Night ? 0.25f : 0.8f);
             }
-            else if (Game1.getCharacterFromName(this.State.PlayerName) is NPC npc)
+            else if (this.Driver is NPC npc)
             {
                 Texture2D texture;
                 try
@@ -658,7 +659,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(91, 12) * scale;
             Utility.drawBoldText(b, text, font, position + shake - textSize * textScale / 2, textColour, textScale);
 
-            text = this.State.PlayerName.ToUpper();
+            text = this.Driver.displayName.ToUpper();
             if (text.Length > length)
                 text = $"{text.Take(length)}.";
             textSize = font.MeasureString(text);
