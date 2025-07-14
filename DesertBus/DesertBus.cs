@@ -59,6 +59,7 @@ public class Game : IMinigame
     public static ICue StartNoise;
     public static ICue EngineNoise;
     public static ICue RoadNoise;
+    public static ICue OffroadNoise;
 
     public static Texture2D Sprites;
     public BasicEffect basicEffect;
@@ -174,6 +175,12 @@ public class Game : IMinigame
         {
             Game.EngineNoise.SetVariable("Volume", 0);
             Game.EngineNoise.Resume();
+        }
+        Game1.playSound("trainLoop", out Game.OffroadNoise);
+        if (Game.OffroadNoise is not null)
+        {
+            Game.OffroadNoise.SetVariable("Volume", 0);
+            Game.OffroadNoise.Resume();
         }
 
         this.changeScreenSize();
@@ -867,6 +874,11 @@ public class Game : IMinigame
             double volume = this.Speed / this.Rules.MaxSpeed * 10 + 25;
             Game.EngineNoise.SetVariable("Volume", (int)volume);
             Game.EngineNoise.SetVariable("Frequency", (int)volume);
+        }
+        if (Game.OffroadNoise is not null)
+        {
+            double volume = isOffRoad ? 100 : 0;
+            Game.OffroadNoise.SetVariable("Volume", (int)volume);
         }
         // decor
         {
