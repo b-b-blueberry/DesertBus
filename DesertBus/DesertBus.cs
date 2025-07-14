@@ -61,6 +61,7 @@ public class Game : IMinigame
     public static ICue RoadNoise;
     public static ICue OffroadNoise;
 
+    public static Texture2D Logo;
     public static Texture2D Sprites;
     public BasicEffect basicEffect;
 
@@ -94,6 +95,7 @@ public class Game : IMinigame
     public bool EngineOn;
     public double EngineTimer;
 
+    public double LogoTimer;
     public double FailTimer;
     public double EndGameTimer;
 
@@ -101,6 +103,8 @@ public class Game : IMinigame
     public int Fade;
     public bool Quit;
 
+    public bool IsLogoUp => this.LogoTimer > -1000;
+    public bool AllowInput => !(this.IsLogoUp || this.Failure);
     public bool CanEnd => this.Success || this.Failure;
     public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
     public bool Failure => this.Speed <= 0 && this.FailTimer >= this.Rules.FailTime;
@@ -109,13 +113,15 @@ public class Game : IMinigame
 
     public event OnEndDelegate OnEnd;
 
-    public Game(GameData data, GameRules rules, GameState state, GameLocation location)
+    public Game(GameData data, GameRules rules, GameState state, GameLocation location, double logoTimer = -1000)
     {
         this.Night = Game1.isDarkOut(location);
         string path = this.Night ? "assets/sprites-night.png" : "assets/sprites.png";
         Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(path);
+        Texture2D logo = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/logo.png");
 
         Game.Sprites = sprites;
+        Game.Logo = logo;
         this.basicEffect = new(Game1.graphics.GraphicsDevice);
 
         this.Data = data;
@@ -141,6 +147,7 @@ public class Game : IMinigame
         this.EngineOn = this.Speed > 0;
         this.EngineTimer = 0;
 
+        this.LogoTimer = logoTimer;
         this.FailTimer = 0;
         this.EndGameTimer = 5000;
 
@@ -181,6 +188,11 @@ public class Game : IMinigame
         {
             Game.OffroadNoise.SetVariable("Volume", 0);
             Game.OffroadNoise.Resume();
+        }
+
+        if (this.IsLogoUp)
+        {
+            Game1.playSound("Cowboy_Secret");
         }
 
         this.changeScreenSize();
@@ -334,6 +346,26 @@ public class Game : IMinigame
             + new Vector2((float)(Math.Min(100, Math.Abs(this.State.Position)) * Math.Sign(this.State.Position) / 20d), 0) * scale;
         Color colour = Color.White;
         float alpha = 1f;
+
+        // LOGO
+
+        if (this.LogoTimer > 0)
+        {
+            position = this.View.Center.ToVector2();
+            b.Draw(
+                texture: Game.Logo,
+                position: position,
+                sourceRectangle: null,
+                color: Color.White,
+                rotation: 0,
+                origin: Game.Logo.Bounds.Size.ToVector2() / 2,
+                scale: scale,
+                effects: SpriteEffects.None,
+                layerDepth: 1);
+
+            b.End();
+            return;
+        }
 
         float horizon = 0.333f;
         float median = (float)-this.State.Position / 100;
@@ -780,10 +812,16 @@ public class Game : IMinigame
         bool isOffRoad = this.Rules.Width > 0 && Math.Abs(this.State.Position) > this.Rules.Width / 2;
         bool isOutOfBounds = isOffRoad && Math.Abs(this.State.Position) >= this.Rules.Width;
 
+        // logo
+        if (this.IsLogoUp)
+        {
+            this.LogoTimer -= ms;
+            return this.Quit;
+        }
         // input
         {
-            this.Brake = !this.Failure && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton);
-            this.Accelerator = !this.Failure && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton);
+            this.Brake = this.AllowInput && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveDownButton);
+            this.Accelerator = this.AllowInput && Game1.isOneOfTheseKeysDown(Game1.oldKBState, Game1.options.moveUpButton);
         }
         // speed
         if (!this.Failure)
@@ -799,7 +837,7 @@ public class Game : IMinigame
             this.State.Distance = Math.Clamp(this.State.Distance + this.Speed / 60d, 0, this.Rules.Distance + this.Rules.MaxSpeed * 10); // a little extra for fade-out
         }
         // steering
-        if (!this.Failure)
+        if (this.AllowInput)
         {
             // player steering eases in and out to be cool & annoying
             double rotationBounds = Math.PI * this.Rules.SteeringRotations;
@@ -994,12 +1032,18 @@ public class Game : IMinigame
 
     public void receiveLeftClick(int x, int y, bool playSound = true)
     {
-        this.Honk();
+        if (this.AllowInput)
+        {
+            this.Honk();
+        }
     }
 
     public void receiveRightClick(int x, int y, bool playSound = true)
     {
-        this.Doors();
+        if (this.AllowInput)
+        {
+            this.Doors();
+        }
     }
 
     public void releaseLeftClick(int x, int y)
