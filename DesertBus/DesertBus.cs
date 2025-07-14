@@ -189,7 +189,7 @@ public class Game : IMinigame
         Decor decor = this.Decor.Get();
         decor.Position = Game1.random.NextDouble() - 0.5d;
         decor.Distance = randomY ? Game1.random.NextDouble() * 0.25d : 0d;
-        if (0d < decor.Position && decor.Position < 0.05d && this.State.Distance % 10 == 0)
+        if (0d < decor.Position && decor.Position < 0.05d && this.State.Distance % 10 < 1)
         {
             // sign
             decor.Sprites = new Dictionary<float, Rectangle>{
