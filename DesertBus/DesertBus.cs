@@ -72,6 +72,8 @@ public class Game : IMinigame
 
     public Pool<Decor> Decor;
 
+    public Rectangle Window => new(0, 0, Game1.viewport.Width, Game1.viewport.Height);
+
     public Rectangle View;
     public float Opacity;
     public Vector2 Shake;
@@ -179,9 +181,10 @@ public class Game : IMinigame
 
     public void changeScreenSize()
     {
-        Rectangle viewport = Game1.game1.localMultiplayerWindow;
-        Point size = (this.Data.Size * this.Data.Scale).ToPoint();
-        this.View = new(viewport.X + viewport.Width / 2 - size.X / 2, viewport.Y + viewport.Height / 2 - size.Y / 2, size.X, size.Y);
+        Rectangle window = this.Window;
+        Vector2 size = (this.Data.Size * this.Data.Scale / Game1.options.zoomLevel);
+        Vector2 position = new Vector2(window.Width - size.X, window.Height - size.Y) / 2;
+        this.View = new(position.ToPoint(), size.ToPoint());
     }
 
     public void AddDecor(bool randomY = false)
@@ -315,8 +318,8 @@ public class Game : IMinigame
     {
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
         
-        Rectangle view = Game1.game1.localMultiplayerWindow;
-        float scale = this.Data.Scale;
+        Rectangle view = this.Window;
+        float scale = this.Data.Scale / Game1.options.zoomLevel;
         Vector2 position;
         Rectangle source;
         Vector2 shake = this.Shake
@@ -495,17 +498,15 @@ public class Game : IMinigame
         }
         // bus dashboard
         {
-            position = this.View.Location.ToVector2();
+            position = this.View.Center.ToVector2() + new Vector2(19, 0) * scale;
             source = new(0, 0, 300, 200);
-            Vector2 origin = source.Size.ToVector2() / 2;
-            Vector2 diff = origin / 2 - this.View.Size.ToVector2() / scale / 2;
             b.Draw(
                 texture: Game.Sprites,
-                position: position + shake + origin * scale + diff,
+                position: position + shake,
                 sourceRectangle: source,
                 color: colour,
                 rotation: 0,
-                origin: origin,
+                origin: source.Size.ToVector2() / 2,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
