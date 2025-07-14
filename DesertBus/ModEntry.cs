@@ -12,6 +12,7 @@ namespace DesertBus;
 public class ModConfig
 {
     public bool Intro { get; set; } = true;
+    public bool ArcadeGame { get; set; } = true;
     public bool AbigailGame { get; set; } = true;
 }
 
@@ -141,6 +142,23 @@ public class ModEntry : Mod
 [HarmonyPatch]
 public static class HarmonyPatches
 {
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(GameLocation))]
+    [HarmonyPatch(nameof(GameLocation.showPrairieKingMenu))]
+    public static bool GameLocation_ShowPrairieKingMenu_Prefix()
+    {
+        // the real journey of the prairie king
+        if (ModEntry.Config.ArcadeGame)
+        {
+            ModEntry.TryStartGame(from: null, to: null, forcePlayerToDrive: true, success =>
+            {
+                // do nothing
+            });
+            return false;
+        }
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Event.DefaultCommands))]
     [HarmonyPatch(nameof(Event.DefaultCommands.Cutscene))]
