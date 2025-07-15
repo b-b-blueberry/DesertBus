@@ -12,7 +12,16 @@ public class GameData
 {
     public float Scale;
     public Vector2 Size;
+    public List<GameAppearance> Appearances;
     public List<GameRules> Rules;
+}
+
+public class GameAppearance
+{
+    public string Texture;
+    public string NightTexture;
+    public string LogoTexture;
+    public string Condition = null;
 }
 
 public class GameRules
@@ -59,13 +68,14 @@ public class Game : IMinigame
     public static ICue RoadNoise;
     public static ICue OffroadNoise;
 
-    public static Texture2D Logo;
-    public static Texture2D Sprites;
+    public Texture2D Logo;
+    public Texture2D Sprites;
     public BasicEffect basicEffect;
 
     public Character Driver;
 
     public GameData Data;
+    public GameAppearance Appearance;
     public GameRules Rules;
     public GameState State;
 
@@ -113,15 +123,16 @@ public class Game : IMinigame
 
     public event OnEndDelegate OnEnd;
 
-    public Game(GameData data, GameRules rules, GameState state, GameLocation location, Character driver, double logoTimer = -1000)
+    public Game(GameData data, GameAppearance appearance, GameRules rules, GameState state, GameLocation location, Character driver, double logoTimer = -1000)
     {
         this.Night = Game1.isDarkOut(location);
-        string path = this.Night ? "assets/sprites-night.png" : "assets/sprites.png";
-        Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(path);
-        Texture2D logo = ModEntry.Instance.Helper.ModContent.Load<Texture2D>("assets/logo.png");
 
-        Game.Sprites = sprites;
-        Game.Logo = logo;
+        this.Appearance = appearance;
+        Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(this.Night ? appearance.NightTexture : appearance.Texture);
+        Texture2D logo = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(appearance.LogoTexture);
+
+        this.Sprites = sprites;
+        this.Logo = logo;
         this.basicEffect = new(Game1.graphics.GraphicsDevice);
 
         this.Driver = driver;
@@ -348,6 +359,7 @@ public class Game : IMinigame
             + new Vector2((float)(Math.Min(100, Math.Abs(this.State.Position)) * Math.Sign(this.State.Position) / 20d), 0) * scale;
         Color colour = Color.White;
         float alpha = 1f;
+        Texture2D texture = this.Sprites;
 
         // LOGO
 
@@ -355,12 +367,12 @@ public class Game : IMinigame
         {
             position = this.View.Center.ToVector2();
             b.Draw(
-                texture: Game.Logo,
+                texture: this.Logo,
                 position: position,
                 sourceRectangle: null,
                 color: Color.White,
                 rotation: 0,
-                origin: Game.Logo.Bounds.Size.ToVector2() / 2,
+                origin: this.Logo.Bounds.Size.ToVector2() / 2,
                 scale: scale,
                 effects: SpriteEffects.None,
                 layerDepth: 1);
@@ -389,7 +401,7 @@ public class Game : IMinigame
             position = this.View.Center.ToVector2();
             source = new(0, 420, 270, 180);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + new Vector2(median, 0) * scale,
                 sourceRectangle: source,
                 color: colour,
@@ -489,7 +501,7 @@ public class Game : IMinigame
                 offset = new Vector2(
                     x: (float)perspective(new Vector2((float)decor.Position, (float)decor.Distance), ratio) * this.View.Width,
                     y: ratio * (this.View.Height - this.View.Height * horizon));
-                decor.Draw(b, position + offset, scale);
+                decor.Draw(b, texture, position + offset, scale);
             }
         }
 
@@ -521,7 +533,7 @@ public class Game : IMinigame
             position = this.View.Center.ToVector2() + new Vector2(52, 4) * scale;
             source = new(0, 216, 172, 84);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 1.25f + this.Shake * 0.5f * scale,
                 sourceRectangle: source,
                 color: colour,
@@ -534,14 +546,14 @@ public class Game : IMinigame
         // odometer
         {
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(165, -23) * scale;
-            this.Odometer.Draw(b, position + shake, scale, alpha, this.Night ? new(75,85,75) : Color.White);
+            this.Odometer.Draw(b, texture, position + shake, scale, alpha, this.Night ? new(75,85,75) : Color.White);
         }
         // bus dashboard
         {
             position = this.View.Center.ToVector2() + new Vector2(19, 0) * scale;
             source = new(0, 0, 300, 200);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
@@ -566,7 +578,7 @@ public class Game : IMinigame
                 foreach ((Vector2 v, Rectangle r) in lights)
                 {
                     b.Draw(
-                        texture: Game.Sprites,
+                        texture: texture,
                         position: position + v * scale + shake,
                         sourceRectangle: r,
                         color: colour * 0.75f,
@@ -586,7 +598,7 @@ public class Game : IMinigame
             source = new Rectangle(0, 380, 24, 40);
             source.X += source.Width * frame;
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 1.5f,
                 color: colour,
                 sourceRectangle: source,
@@ -601,7 +613,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(60, 37) * scale;
             source = new(0, 300, 80, 32);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 1.125f,
                 sourceRectangle: source,
                 color: colour,
@@ -629,18 +641,18 @@ public class Game : IMinigame
             }
             else if (this.Driver is NPC npc)
             {
-                Texture2D texture;
+                Texture2D npcTexture;
                 try
                 {
-                    texture = Game1.content.Load<Texture2D>($"Characters/{npc.getTextureName()}");
+                    npcTexture = Game1.content.Load<Texture2D>($"Characters/{npc.getTextureName()}");
                 }
                 catch
                 {
-                    texture = npc.Sprite.Texture;
+                    npcTexture = npc.Sprite.Texture;
                 }
                 position += new Vector2(51, 3) * scale;
                 source = npc.getMugShotSourceRect();
-                b.Draw(texture, position + shake, source, Color.Lerp(colour, Color.Beige, 0.95f) * 0.85f, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
+                b.Draw(npcTexture, position + shake, source, Color.Lerp(colour, Color.Beige, 0.95f) * 0.85f, 0, Vector2.Zero, scale, SpriteEffects.None, 1);
             }
         }
         // driver name
@@ -669,7 +681,7 @@ public class Game : IMinigame
         // chronometer
         {
             position = new Vector2(this.View.Center.X, this.View.Top) + new Vector2(72, 11) * scale;
-            this.Clock.Draw(b, position + shake, scale, alpha);
+            this.Clock.Draw(b, texture, position + shake, scale, alpha);
         }
         // speedometer
         {
@@ -678,7 +690,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(98.5f, -27f) * scale;
             source = new Rectangle(62, 200, 7, 16);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
@@ -698,7 +710,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(1.5f, -27f) * scale;
             source = new Rectangle(62, 200, 7, 16);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
@@ -715,7 +727,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(68, -4) * scale;
             source = new Rectangle(55, 200, 7, 16);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
@@ -732,7 +744,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(30, -4) * scale;
             source = new Rectangle(55, 200, 7, 16);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake,
                 sourceRectangle: source,
                 color: colour,
@@ -748,7 +760,7 @@ public class Game : IMinigame
                 + new Vector2(this.DoorsTimer * 32, 4 * (float)Math.Sin(Math.PI * this.DoorsTimer)) * scale;
             source = new Rectangle(176, 257, 15, 43);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 1.25f,
                 sourceRectangle: source,
                 color: colour,
@@ -764,7 +776,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -6) * scale;
             source = new Rectangle(172, 200, 23, 57);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 1.5f,
                 sourceRectangle: source,
                 color: colour,
@@ -779,7 +791,7 @@ public class Game : IMinigame
             position = new Vector2(this.View.Left, this.View.Bottom) + new Vector2(47, -30) * scale;
             source = new Rectangle(200, 200, 100, 100);
             b.Draw(
-                texture: Game.Sprites,
+                texture: texture,
                 position: position + shake * 2f,
                 sourceRectangle: source,
                 color: colour,
@@ -1116,7 +1128,7 @@ public class Odometer
         }
     }
 
-    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha, Color colour)
+    public void Draw(SpriteBatch b, Texture2D texture, Vector2 position, float scale, float alpha, Color colour)
     {
         // backboard
         {
@@ -1141,8 +1153,8 @@ public class Odometer
             float offset = (this.Offsets[i]) * scale;
             Color digitColour = (i == digits.Length - 1 ? Color.Black : Color.White) * alpha;
 
-            Digits.draw(b, digit, position + new Vector2(0, offset), scale, digitColour);
-            Digits.draw(b, below, position + new Vector2(0, offset + Digits.Slice.Height * scale), scale, digitColour);
+            Digits.draw(b, texture, digit, position + new Vector2(0, offset), scale, digitColour);
+            Digits.draw(b, texture, below, position + new Vector2(0, offset + Digits.Slice.Height * scale), scale, digitColour);
             position -= new Vector2(Digits.Slice.Width * scale, 0);
         }
     }
@@ -1150,7 +1162,7 @@ public class Odometer
 
 public class Clock
 {
-    public void Draw(SpriteBatch b, Vector2 position, float scale, float alpha)
+    public void Draw(SpriteBatch b, Texture2D texture, Vector2 position, float scale, float alpha)
     {
         char c = Game1.currentGameTime.TotalGameTime.Seconds % 2 == 0 ? ' ' : ':';
         string text = $"{DateTime.Now.Hour:00}{c}{DateTime.Now.Minute:00}";
@@ -1168,7 +1180,7 @@ public class Clock
         for (int i = text.Length - 1; i >= 0; --i)
         {
             uint digit = (uint)text[i] - '0';
-            Digits.draw(b, digit, position, scale, colour);
+            Digits.draw(b, texture, digit, position, scale, colour);
             position -= new Vector2(Digits.Slice.Width * scale, 0);
         }
     }
@@ -1176,7 +1188,6 @@ public class Clock
 
 public static class Digits
 {
-    public static Texture2D Sprites => Game.Sprites;
     public static readonly Rectangle Slice = new Rectangle(x: 0, y: 200, width: 5, height: 7);
     public static readonly Rectangle[] Sources = new Rectangle[11];
 
@@ -1194,12 +1205,12 @@ public static class Digits
         }
     }
 
-    public static void draw(SpriteBatch b, uint digit, Vector2 position, float scale, Color colour)
+    public static void draw(SpriteBatch b, Texture2D texture, uint digit, Vector2 position, float scale, Color colour)
     {
         if (digit < 0 || digit >= Digits.Sources.Length)
             return;
         b.Draw(
-            texture: Digits.Sprites,
+            texture: texture,
             position: position,
             sourceRectangle: Digits.Sources[digit],
             color: colour,
@@ -1243,7 +1254,7 @@ public class Decor : IPooled
         this.Distance += speed / ms / 2000d * (1 - Math.Abs(this.Position));
     }
 
-    public void Draw(SpriteBatch b, Vector2 position, float scale)
+    public void Draw(SpriteBatch b, Texture2D texture, Vector2 position, float scale)
     {
         if (this.IsOffscreen)
             return;
@@ -1251,7 +1262,7 @@ public class Decor : IPooled
         Rectangle source = this.Sprites.FirstOrDefault(pair => pair.Key < this.Distance).Value;
 
         b.Draw(
-            texture: Game.Sprites,
+            texture: texture,
             position: position,
             sourceRectangle: source,
             color: Color.White * (float)(this.Distance * 50),
