@@ -11,6 +11,7 @@ namespace DesertBus;
 
 public class ModConfig
 {
+    public bool BusTravel { get; set; } = true;
     public bool ArcadeGame { get; set; } = true;
     public bool AbigailGame { get; set; } = true;
 }
@@ -60,7 +61,7 @@ public class ModEntry : Mod
         if (Game1.CurrentEvent is not null || Game1.player.passedOut)
             return;
 
-        if (e.OldLocation != e.NewLocation)
+        if (ModEntry.Config.BusTravel && e.OldLocation != e.NewLocation)
         {
             Character driver = ModEntry.IsPamDriving(e.OldLocation) ? ModEntry.Pam : Game1.player;
             ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, driver: driver, onEnd: success =>
