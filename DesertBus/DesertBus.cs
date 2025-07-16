@@ -57,7 +57,7 @@ public class GameRules
     public double SteeringRotations = 3d;
     public double PositionDrift = 5d;
     // others
-    public double BugSplatDistance = 362000;
+    public int BugSplatDistance = 362000;
     // road conditions
     public int Width = 100;
     public int Distance = 580000;
