@@ -10,8 +10,6 @@ namespace DesertBus;
 
 public class GameData
 {
-    public float Scale;
-    public Vector2 Size;
     public List<GameAudio> Audio;
     public List<GameAppearance> Appearances;
     public List<GameRules> Rules;
@@ -99,6 +97,9 @@ public class Game : IMinigame
     public Odometer Odometer;
 
     public Pool<Decor> Decor;
+
+    public static readonly Vector2 Size = new(240, 180);
+    public static readonly float Scale = Game1.pixelZoom;
 
     public Rectangle Window => new(0, 0, Game1.viewport.Width, Game1.viewport.Height);
 
@@ -232,7 +233,7 @@ public class Game : IMinigame
     public void changeScreenSize()
     {
         Rectangle window = this.Window;
-        Vector2 size = (this.Data.Size * this.Data.Scale / Game1.options.zoomLevel);
+        Vector2 size = (Game.Size * Game.Scale / Game1.options.zoomLevel);
         Vector2 position = new Vector2(window.Width - size.X, window.Height - size.Y) / 2;
         this.View = new(position.ToPoint(), size.ToPoint());
     }
@@ -369,7 +370,7 @@ public class Game : IMinigame
         b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, new RasterizerState());
         
         Rectangle view = this.Window;
-        float scale = this.Data.Scale / Game1.options.zoomLevel;
+        float scale = Game.Scale / Game1.options.zoomLevel;
         Vector2 position;
         Rectangle source;
         Vector2 shake = this.Shake
