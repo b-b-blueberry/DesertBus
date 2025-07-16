@@ -4,6 +4,20 @@
         "X": 240,
         "Y": 180
     },
+    "Audio": [
+        {
+            "Logo": "Cowboy_Secret",
+            "EngineStart": "busDriveOff",
+            "EngineLoop": "heavyEngine",
+            "RoadLoop": "roadnoise",
+            "OffroadLoop": "trainLoop",
+            "Honk": "Duck",
+            "DoorOpen": "trashcanlid",
+            "DoorClose": "doorCreakReverse",
+            "BugSplat": "slimeHit",
+            "Condition": null
+        }
+    ],
     "Appearances": [
         {
             "Texture": "Mods/blueberry.DesertBus/Sprites",

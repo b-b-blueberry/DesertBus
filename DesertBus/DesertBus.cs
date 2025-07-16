@@ -12,8 +12,23 @@ public class GameData
 {
     public float Scale;
     public Vector2 Size;
+    public List<GameAudio> Audio;
     public List<GameAppearance> Appearances;
     public List<GameRules> Rules;
+}
+
+public class GameAudio
+{
+    public string Logo;
+    public string EngineStart;
+    public string EngineLoop;
+    public string RoadLoop;
+    public string OffroadLoop;
+    public string Honk;
+    public string DoorOpen;
+    public string DoorClose;
+    public string BugSplat;
+    public string Condition = null;
 }
 
 public class GameAppearance
@@ -75,6 +90,7 @@ public class Game : IMinigame
     public Character Driver;
 
     public GameData Data;
+    public GameAudio Audio;
     public GameAppearance Appearance;
     public GameRules Rules;
     public GameState State;
@@ -123,10 +139,11 @@ public class Game : IMinigame
 
     public event OnEndDelegate OnEnd;
 
-    public Game(GameData data, GameAppearance appearance, GameRules rules, GameState state, GameLocation location, Character driver, double logoTimer = -1000)
+    public Game(GameData data, GameAudio audio, GameAppearance appearance, GameRules rules, GameState state, GameLocation location, Character driver, double logoTimer = -1000)
     {
         this.Night = Game1.isDarkOut(location);
 
+        this.Audio = audio;
         this.Appearance = appearance;
         Texture2D sprites = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(this.Night ? appearance.NightTexture : appearance.Texture);
         Texture2D logo = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(appearance.LogoTexture);
@@ -184,19 +201,19 @@ public class Game : IMinigame
 
         // noise
         Game1.stopMusicTrack(MusicContext.Default);
-        Game1.playSound("roadnoise", out Game.RoadNoise);
+        Game1.playSound(this.Audio.RoadLoop, out Game.RoadNoise);
         if (Game.RoadNoise is not null)
         {
             Game.RoadNoise.SetVariable("Volume", 0);
             Game.RoadNoise.Resume();
         }
-        Game1.playSound("heavyEngine", out Game.EngineNoise);
+        Game1.playSound(this.Audio.EngineLoop, out Game.EngineNoise);
         if (Game.EngineNoise is not null)
         {
             Game.EngineNoise.SetVariable("Volume", 0);
             Game.EngineNoise.Resume();
         }
-        Game1.playSound("trainLoop", out Game.OffroadNoise);
+        Game1.playSound(this.Audio.OffroadLoop, out Game.OffroadNoise);
         if (Game.OffroadNoise is not null)
         {
             Game.OffroadNoise.SetVariable("Volume", 0);
@@ -205,7 +222,7 @@ public class Game : IMinigame
 
         if (this.IsLogoUp)
         {
-            Game1.playSound("Cowboy_Secret");
+            Game1.playSound(this.Audio.Logo);
         }
 
         this.changeScreenSize();
@@ -327,22 +344,22 @@ public class Game : IMinigame
             this.EngineTimer = 2000;
             if (Game.StartNoise is null || !Game.StartNoise.IsPlaying)
             {
-                Game1.playSound("busDriveOff", out Game.StartNoise);
+                Game1.playSound(this.Audio.EngineStart, out Game.StartNoise);
             }
         }
     }
 
     public void Honk()
     {
-        Game1.playSound("Duck", pitch: 0);
+        Game1.playSound(this.Audio.Honk, pitch: 0);
     }
 
     public void Doors()
     {
         if (this.DoorsOpen > 0)
-            Game1.playSound("trashcanlid", pitch: 0);
+            Game1.playSound(this.Audio.DoorOpen);
         else
-            Game1.playSound("doorCreakReverse", pitch: 0);
+            Game1.playSound(this.Audio.DoorClose);
         this.DoorsOpen *= -1;
     }
 
@@ -950,7 +967,7 @@ public class Game : IMinigame
             if (this.State.Distance >= this.Rules.BugSplatDistance)
             {
                 if (this.BugSplat == 0)
-                    Game1.playSound("slimeHit");
+                    Game1.playSound(this.Audio.BugSplat);
                 this.BugSplat = (float)Math.Clamp(this.BugSplat + 1d / ms, 0, 5);
             }
         }
