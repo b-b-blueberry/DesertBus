@@ -159,7 +159,8 @@ public class Game : IMinigame
         this.State = state;
 
         this.Clock = new();
-        this.Odometer = new(digits: 6u, start: 601093d);
+        uint distance = Game1.player.stats.Get($"{ModEntry.STATS_ID}.Distance");
+        this.Odometer = new(digits: 6u, start: ((uint)Math.Floor(601093 + distance / 1000d)));
 
         this.Decor = new(size: 8, create: () => new Decor());
         this.Opacity = 0;
@@ -1119,7 +1120,7 @@ public class Odometer
     public double DisplayValue;
     public double InitialDisplayValue;
 
-    public Odometer(uint digits, double start)
+    public Odometer(uint digits, uint start)
     {
         // values
         this.InitialDisplayValue = start;
