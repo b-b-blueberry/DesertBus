@@ -1,0 +1,19 @@
+{
+    "Name": "Calico Desert Bus [CP]",
+    "Author": "blueberry",
+    "Version": "1.0.0",
+    "Description": "I drive",
+    "UniqueID": "blueberry.DesertBus.CP",
+    "ContentPackFor": {
+        "UniqueID": "Pathoschild.ContentPatcher"
+    },
+    "UpdateKeys": [
+        "???"
+    ],
+    "Dependencies": [
+        {
+            "UniqueID": "blueberry.DesertBus",
+            "Required": true
+        }
+    ]
+}

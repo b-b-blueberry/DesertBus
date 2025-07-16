@@ -11,4 +11,15 @@
 		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ContentPacks Include="../[CP] DesertBus" Version="$(Version)">
+			<IgnoreModFilePaths>bin/.*, obj/.*</IgnoreModFilePaths>
+			<IgnoreModFilePatterns>\.dll$, \.pdb$, \.csproj$</IgnoreModFilePatterns>
+		</ContentPacks>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="../[CP] DesertBus/**" Link="_[CP] DesertBus\%(RecursiveDir)\%(FileName)%(Extension)" CopyToOutputDirectory="Never" />
+	</ItemGroup>
+
 </Project>

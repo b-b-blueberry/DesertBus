@@ -128,8 +128,8 @@ public class Game : IMinigame
         this.Night = Game1.isDarkOut(location);
 
         this.Appearance = appearance;
-        Texture2D sprites = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(this.Night ? appearance.NightTexture : appearance.Texture);
-        Texture2D logo = ModEntry.Instance.Helper.ModContent.Load<Texture2D>(appearance.LogoTexture);
+        Texture2D sprites = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(this.Night ? appearance.NightTexture : appearance.Texture);
+        Texture2D logo = ModEntry.Instance.Helper.GameContent.Load<Texture2D>(appearance.LogoTexture);
 
         this.Sprites = sprites;
         this.Logo = logo;

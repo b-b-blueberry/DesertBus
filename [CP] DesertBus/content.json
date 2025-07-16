@@ -1,0 +1,25 @@
+{
+    "Format": "2.4.0",
+    "Changes": [
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Data",
+            "FromFile": "assets/data.json"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Sprites",
+            "FromFile": "assets/sprites.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Sprites_Night",
+            "FromFile": "assets/sprites-night.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Logo",
+            "FromFile": "assets/logo.png"
+        }
+    ]
+}
