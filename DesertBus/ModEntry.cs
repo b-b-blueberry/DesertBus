@@ -27,6 +27,7 @@ public class ModEntry : Mod
 
     public static string MINIGAME_ID => $"{ModEntry.Instance.ModManifest.UniqueID}.Game";
     public static string STATS_ID => $"{ModEntry.Instance.ModManifest.UniqueID}";
+    public static string STRINGS_PATH => $"Mods/{ModEntry.Instance.ModManifest.UniqueID}/I18n";
 
     public static ModEntry Instance { get; private set; }
     public static ModConfig Config { get; private set; }

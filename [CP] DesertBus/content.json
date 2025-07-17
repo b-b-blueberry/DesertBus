@@ -20,6 +20,11 @@
             "Action": "Load",
             "Target": "Mods/blueberry.DesertBus/Logo",
             "FromFile": "assets/logo.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/I18n",
+            "FromFile": "assets/i18n.json"
         }
     ]
 }
