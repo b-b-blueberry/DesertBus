@@ -14,6 +14,7 @@ public class ModConfig
     public bool BusTravel { get; set; } = true;
     public bool ArcadeGame { get; set; } = true;
     public bool AbigailGame { get; set; } = true;
+    public bool PassOut { get; set; } = true;
 }
 
 public class ModState
@@ -71,10 +72,14 @@ public class ModEntry : Mod
                 {
                     // you get nothing
                 }
-                else
+                else if (ModEntry.Config.PassOut)
                 {
                     // then perish
                     Farmer.passOutFromTired(Game1.player);
+                }
+                else
+                {
+                    // do nothing
                 }
             });
         }
