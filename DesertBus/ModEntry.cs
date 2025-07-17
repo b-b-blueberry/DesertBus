@@ -112,7 +112,7 @@ public class ModEntry : Mod
 
         GameLocation location = Game1.getLocationFromName(from) ?? Game1.currentLocation;
         GameStateQueryContext context = new(location, Game1.player, null, null, Game1.random);
-        GameData data = ModEntry.Instance.Helper.GameContent.Load<GameData>("Mods/blueberry.DesertBus/Data");
+        GameData data = ModEntry.Instance.Helper.GameContent.Load<GameData>("Mods/blueberry.DesertBus/Game/Data");
         GameAudio audio = data.Audio.FirstOrDefault(rules => GameStateQuery.CheckConditions(rules.Condition, context));
         GameAppearance appearance = data.Appearances.FirstOrDefault(rules => GameStateQuery.CheckConditions(rules.Condition, context));
         GameRules rules = defaultRules ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));

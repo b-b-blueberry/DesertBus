@@ -15,9 +15,9 @@
     ],
     "Appearances": [
         {
-            "Texture": "Mods/blueberry.DesertBus/Sprites",
-            "NightTexture": "Mods/blueberry.DesertBus/Sprites_Night",
-            "LogoTexture": "Mods/blueberry.DesertBus/Logo",
+            "Texture": "Mods/blueberry.DesertBus/Game/Sprites",
+            "NightTexture": "Mods/blueberry.DesertBus/Game/Sprites_Night",
+            "LogoTexture": "Mods/blueberry.DesertBus/Game/Logo",
             "Condition": null
         }
     ],
