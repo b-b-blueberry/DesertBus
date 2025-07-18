@@ -277,7 +277,7 @@ public class Game : IMinigame
 
             if (text is not null)
             {
-                Game1.Multiplayer.globalChatInfoMessageEvenInSinglePlayer(text, Game1.player.Name);
+                Game1.Multiplayer.globalChatInfoMessage(text, Game1.player.Name);
             }
 
             // update player stats
@@ -336,7 +336,7 @@ public class Game : IMinigame
             text = $"{ModEntry.MESSAGE_KEY}_Quit";
         }
 
-        Game1.Multiplayer.globalChatInfoMessageEvenInSinglePlayer(text, args);
+        Game1.Multiplayer.globalChatInfoMessage(text, args);
     }
 
     public void DestroyGameAfterQuit()
