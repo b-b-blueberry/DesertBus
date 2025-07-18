@@ -1049,7 +1049,7 @@ public class Game : IMinigame
         }
         if (this.OffroadNoise is not null)
         {
-            double volume = isOffRoad ? 100 : 0;
+            double volume = (isOffRoad && !this.CanEnd) ? this.Speed / this.Rules.MaxSpeed * 25 + 75 : 0;
             this.OffroadNoise.SetVariable("Volume", (int)volume);
         }
         // decor
