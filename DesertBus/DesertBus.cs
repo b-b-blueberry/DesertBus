@@ -793,7 +793,7 @@ public class Game : IMinigame
 
             text = this.Driver.displayName.ToUpper();
             if (text.Length > length)
-                text = $"{text.Take(length)}.";
+                text = $"{text[..length]}.";
             textSize = font.MeasureString(text);
             textScale = scale * 0.333f;
             position += new Vector2(0, 10) * scale;
