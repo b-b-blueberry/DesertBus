@@ -76,10 +76,10 @@ public class GameState
 
 public class Game : IMinigame
 {
-    public static ICue StartNoise;
-    public static ICue EngineNoise;
-    public static ICue RoadNoise;
-    public static ICue OffroadNoise;
+    public ICue StartNoise;
+    public ICue EngineNoise;
+    public ICue RoadNoise;
+    public ICue OffroadNoise;
 
     public Texture2D Logo;
     public Texture2D Sprites;
@@ -203,23 +203,23 @@ public class Game : IMinigame
 
         // noise
         Game1.stopMusicTrack(MusicContext.Default);
-        Game1.playSound(this.Audio.RoadLoop, out Game.RoadNoise);
-        if (Game.RoadNoise is not null)
+        Game1.playSound(this.Audio.RoadLoop, out this.RoadNoise);
+        if (this.RoadNoise is not null)
         {
-            Game.RoadNoise.SetVariable("Volume", 0);
-            Game.RoadNoise.Resume();
+            this.RoadNoise.SetVariable("Volume", 0);
+            this.RoadNoise.Resume();
         }
-        Game1.playSound(this.Audio.EngineLoop, out Game.EngineNoise);
-        if (Game.EngineNoise is not null)
+        Game1.playSound(this.Audio.EngineLoop, out this.EngineNoise);
+        if (this.EngineNoise is not null)
         {
-            Game.EngineNoise.SetVariable("Volume", 0);
-            Game.EngineNoise.Resume();
+            this.EngineNoise.SetVariable("Volume", 0);
+            this.EngineNoise.Resume();
         }
-        Game1.playSound(this.Audio.OffroadLoop, out Game.OffroadNoise);
-        if (Game.OffroadNoise is not null)
+        Game1.playSound(this.Audio.OffroadLoop, out this.OffroadNoise);
+        if (this.OffroadNoise is not null)
         {
-            Game.OffroadNoise.SetVariable("Volume", 0);
-            Game.OffroadNoise.Resume();
+            this.OffroadNoise.SetVariable("Volume", 0);
+            this.OffroadNoise.Resume();
         }
 
         if (this.IsLogoUp)
@@ -344,9 +344,9 @@ public class Game : IMinigame
         {
             this.EngineOn = true;
             this.EngineTimer = 2000;
-            if (Game.StartNoise is null || !Game.StartNoise.IsPlaying)
+            if (this.StartNoise is null || !this.StartNoise.IsPlaying)
             {
-                Game1.playSound(this.Audio.EngineStart, out Game.StartNoise);
+                Game1.playSound(this.Audio.EngineStart, out this.StartNoise);
             }
         }
     }
@@ -933,21 +933,21 @@ public class Game : IMinigame
         {
             this.EngineTimer = Math.Max(this.EngineTimer - ms, 0);
         }
-        if (Game.RoadNoise is not null)
+        if (this.RoadNoise is not null)
         {
             double volume = this.Speed / this.Rules.MaxSpeed * this.AcceleratorTimer * 20 + 80;
-            Game.RoadNoise.SetVariable("Volume", (int)volume);
+            this.RoadNoise.SetVariable("Volume", (int)volume);
         }
-        if (Game.EngineNoise is not null)
+        if (this.EngineNoise is not null)
         {
             double volume = this.Speed / this.Rules.MaxSpeed * 10 + 25;
-            Game.EngineNoise.SetVariable("Volume", (int)volume);
-            Game.EngineNoise.SetVariable("Frequency", (int)volume);
+            this.EngineNoise.SetVariable("Volume", (int)volume);
+            this.EngineNoise.SetVariable("Frequency", (int)volume);
         }
-        if (Game.OffroadNoise is not null)
+        if (this.OffroadNoise is not null)
         {
             double volume = isOffRoad ? 100 : 0;
-            Game.OffroadNoise.SetVariable("Volume", (int)volume);
+            this.OffroadNoise.SetVariable("Volume", (int)volume);
         }
         // decor
         {
@@ -1028,10 +1028,10 @@ public class Game : IMinigame
 
     public void unload()
     {
-        Game.StartNoise?.Stop(AudioStopOptions.Immediate);
-        Game.EngineNoise?.Stop(AudioStopOptions.Immediate);
-        Game.RoadNoise?.Stop(AudioStopOptions.Immediate);
-        Game.OffroadNoise?.Stop(AudioStopOptions.Immediate);
+        this.StartNoise?.Stop(AudioStopOptions.Immediate);
+        this.EngineNoise?.Stop(AudioStopOptions.Immediate);
+        this.RoadNoise?.Stop(AudioStopOptions.Immediate);
+        this.OffroadNoise?.Stop(AudioStopOptions.Immediate);
 
         Game1.stopMusicTrack(MusicContext.MiniGame);
 
