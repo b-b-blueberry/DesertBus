@@ -160,7 +160,7 @@ public class Game : IMinigame
         this.State = state;
 
         this.Clock = new();
-        uint distance = Game1.player.stats.Get($"{ModEntry.STATS_ID}.Distance");
+        uint distance = Game1.player.stats.Get($"{ModEntry.STATS_ID}_Distance");
         this.Odometer = new(digits: 6u, start: ((uint)Math.Floor(601093 + distance / 1000d)));
 
         this.Decor = new(size: 8, create: () => new Decor());
@@ -236,6 +236,40 @@ public class Game : IMinigame
         Vector2 size = (Game.Size * Game.Scale / Game1.options.zoomLevel);
         Vector2 position = new Vector2(window.Width - size.X, window.Height - size.Y) / 2;
         this.View = new(position.ToPoint(), size.ToPoint());
+    }
+
+    public void EndGameAndQuit()
+    {
+        this.unload();
+
+        this.OnEnd?.Invoke(this.Success);
+
+        Game1.globalFadeToClear();
+
+        // update player stats
+        Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Distance", (uint)this.State.Distance);
+        Game1.player.stats.Set($"{ModEntry.STATS_ID}_MaxDistance", Math.Max(Game1.player.stats.Get($"{ModEntry.STATS_ID}_MaxDistance"), (uint)this.State.Distance));
+        if (this.Success)
+        {
+            Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Success");
+        }
+        else if (this.Failure)
+        {
+            Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Failure");
+        }
+    }
+
+    public void DestroyGameAfterQuit()
+    {
+        this.StartNoise?.Stop(AudioStopOptions.Immediate);
+        this.EngineNoise?.Stop(AudioStopOptions.Immediate);
+        this.RoadNoise?.Stop(AudioStopOptions.Immediate);
+        this.OffroadNoise?.Stop(AudioStopOptions.Immediate);
+
+        Game1.stopMusicTrack(MusicContext.MiniGame);
+
+        Game1.currentMinigame = null;
+        ModEntry.State.Value.Game = null;
     }
 
     public void AddDecor(bool randomY = false)
@@ -1003,24 +1037,7 @@ public class Game : IMinigame
         }
         if (this.Quit && this.Opacity <= 0)
         {
-            this.unload();
-
-            this.OnEnd?.Invoke(this.Success);
-
-            Game1.globalFadeToClear();
-
-            // update player stats
-            Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Distance", (uint)this.State.Distance);
-            Game1.player.stats.Set($"{ModEntry.STATS_ID}.MaxDistance", Math.Max(Game1.player.stats.Get($"{ModEntry.STATS_ID}.MaxDistance"), (uint)this.State.Distance));
-            if (this.Success)
-            {
-                Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Success");
-            }
-            else if (this.Failure)
-            {
-                Game1.player.stats.Increment($"{ModEntry.STATS_ID}.Failure");
-            }
-
+            this.EndGameAndQuit();
             return true;
         }
         return false;
@@ -1028,15 +1045,7 @@ public class Game : IMinigame
 
     public void unload()
     {
-        this.StartNoise?.Stop(AudioStopOptions.Immediate);
-        this.EngineNoise?.Stop(AudioStopOptions.Immediate);
-        this.RoadNoise?.Stop(AudioStopOptions.Immediate);
-        this.OffroadNoise?.Stop(AudioStopOptions.Immediate);
-
-        Game1.stopMusicTrack(MusicContext.MiniGame);
-
-        Game1.currentMinigame = null;
-        ModEntry.State.Value.Game = null;
+        this.DestroyGameAfterQuit();
     }
 
     public bool forceQuit()
