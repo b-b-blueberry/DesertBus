@@ -31,6 +31,25 @@
             "From": "Desert",
             "To": "BusStop",
             "Condition": "BLUEBERRY_DESERT_BUS_AVAILABLE"
+        },
+        {
+            // absolute dominion
+            "From": "(BC)blueberry.DesertBus_Arcade",
+            "To": "(BC)blueberry.DesertBus_Arcade",
+            "Speed": 0,
+            "Acceleration": 5.0,
+            "Deceleration": -1.0,
+            "Braking": -10.0,
+            "MaxSpeed": 235,
+            "SteeringToWheel": 1.25,
+            "SteeringToGround": 0.0175,
+            "SteeringDecay": -0.05,
+            "PositionDrift": 20.0,
+            "BugSplatDistance": 19000,
+            "Distance": 29000,
+            "FailTime": 1500,
+            "FailTimeDecay": -0.05,
+            "Condition": null
         }
     ]
 }

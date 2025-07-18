@@ -9,7 +9,21 @@
             "Action": "EditData",
             "Target": "Mods/blueberry.DesertBus/I18n",
             "Entries": {
-                "Game_Driver": "YOUR DRIVER IS"
+                "Game_Driver": "YOUR DRIVER IS",
+
+                "Item_Shirt_Name": "Bus Driver Top",
+                "Item_Shirt_Description": "Sweaty singlet of a seasoned bus driver.",
+
+                "Item_Pants_Name": "Bus Driver Pants",
+                "Item_Pants_Description": "Comfortable well-worn pants of a career bus driver.",
+
+                "Item_Arcade_Name": "Calico Desert Bus Arcade System",
+                "Item_Arcade_Description": "Looks like it was buried in a desert somewhere.. does this still work right?",
+
+                "Item_Keys_Name": "Keys to the Bus",
+                "Item_Keys_Description": "Keys to the Josie-Jameson Starliner(tm) parked at the Bus Stop.\nBus rides are free.",
+
+                "UI_Keys_Mail": "Added Keys to the Bus to your = Special Items. The bus can now be used anytime for free."
             }
         },
         {
@@ -26,6 +40,16 @@
                 "Chat_blueberry.DesertBus_Distance_100km": "{0} has driven the bus 100,000 meters.",
                 "Chat_blueberry.DesertBus_Distance_1000km": "{0} has driven the bus 1,000,000 meters!"
             }   
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/mail",
+            "Entries": {
+                "blueberry.DesertBus_1km": "Hey Pam,^Lost and found here, hope we've got the right address. You left this in the cab. Could do with a wash.^^-Calico Desert Bus Service %item id (S)blueberry.DesertBus_Shirt %%[#]Calico Desert Bus - Lost and found 1",
+                "blueberry.DesertBus_10km": "Hi Pam,^Not sure how you managed, but we found these on the seat. Please clean up the bus when you're done.^Thoroughly.^^-Calico Desert Bus Service %item id (P)blueberry.DesertBus_Pants %%[#]Calico Desert Bus - Lost and found 2",
+                "blueberry.DesertBus_100km": "{{Lowercase:{{PlayerName}}}}^      you dri-ve bu-us^dri-ive mo-ore^^         bu-us^^^  de-ese-ert^           bu-us %item id (BC)blueberry.DesertBus_Arcade %%[#]CALICO DESERT BUS Arcade",
+                "blueberry.DesertBus_1000km": "Hi Pam,^Lost and found again.^Looks like you left these in the ignition at the depot. Try and be more careful, this is company property!^^-Calico Desert Bus Service %item id (O)blueberry.DesertBus_Keys %%[#]Calico Desert Bus - Lost and found 3"
+            }
         }
     ]
 }

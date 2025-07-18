@@ -1,0 +1,164 @@
+{
+    "Changes": [
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Base/Shirt",
+            "FromFile": "assets/base/shirt.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Base/Pants",
+            "FromFile": "assets/base/pants.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Base/Arcade",
+            "FromFile": "assets/base/arcade.png"
+        },
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/Base/Keys",
+            "FromFile": "assets/base/keys.png"
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shirts",
+            "Entries": {
+                "blueberry.DesertBus_Shirt": {
+                    "Name": "blueberry.DesertBus_Shirt",
+                    "DisplayName": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Shirt_Name]",
+                    "Description": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Shirt_Description]",
+                    "Price": 50,
+                    "Texture": "Mods/blueberry.DesertBus/Base/Shirt",
+                    "SpriteIndex": 0,
+                    "CanBeDyed": false,
+                    "HasSleeves": false,
+                    "CanChooseDuringCharacterCustomization": false
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Pants",
+            "Entries": {
+                "blueberry.DesertBus_Pants": {
+                    "Name": "blueberry.DesertBus_Pants",
+                    "DisplayName": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Pants_Name]",
+                    "Description": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Pants_Description]",
+                    "Price": 50,
+                    "Texture": "Mods/blueberry.DesertBus/Base/Pants",
+                    "SpriteIndex": 0,
+                    "CanBeDyed": false,
+                    "IsPrismatic": false,
+                    "CanChooseDuringCharacterCustomization": false
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/BigCraftables",
+            "Entries": {
+                "blueberry.DesertBus_Arcade": {
+                    "Name": "blueberry.DesertBus_Arcade",
+                    "DisplayName": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Arcade_Name]",
+                    "Description": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Arcade_Description]",
+                    "Price": 0,
+                    "Fragility": 0,
+                    "CanBePlacedOutdoors": true,
+                    "CanBePlacedIndoors": true,
+                    "Texture": "Mods/blueberry.DesertBus/Base/Arcade",
+                    "SpriteIndex": 0
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Machines",
+            "Entries": {
+                "(BC)blueberry.DesertBus_Arcade": {
+                    "InteractMethod": "DesertBus.ModEntry, DesertBus: CheckForActionOnDesertBusArcade"
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Objects",
+            "Entries": {
+                "blueberry.DesertBus_Keys": {
+                    "Name": "blueberry.DesertBus_Keys",
+                    "DisplayName": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Keys_Name]",
+                    "Description": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Keys_Description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 0,
+                    "Texture": "Mods/blueberry.DesertBus/Base/Keys",
+                    "SpriteIndex": 0,
+                    "Edibility": 0,
+                    "IsDrink": false
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "blueberry.DesertBus_Keys": {
+                    "DisplayName": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Keys_Name]",
+                    "Description": "[LocalizedText Mods/blueberry.DesertBus/I18n:Item_Keys_Description]",
+                    "TexturePath": "Mods/blueberry.DesertBus/Base/Keys",
+                    "TexturePosition": {
+                        "X": 0,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.DesertBus_1000km"
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/TriggerActions",
+            "Entries": {
+                "blueberry.DesertBus_1km": {
+                    "Id": "blueberry.DesertBus_1km",
+                    "Trigger": "DayEnding",
+                    "Condition": "PLAYER_STAT Current Mods/blueberry.DesertBus.Distance 1000",
+                    "SkipPermanentlyCondition": null,
+                    "HostOnly": false,
+                    "Action": "AddMail Current blueberry.DesertBus_1km",
+                    "Actions": null,
+                    "MarkActionApplied": true
+                },
+                "blueberry.DesertBus_10km": {
+                    "Id": "blueberry.DesertBus_10km",
+                    "Trigger": "DayEnding",
+                    "Condition": "PLAYER_STAT Current Mods/blueberry.DesertBus.Distance 10000",
+                    "SkipPermanentlyCondition": null,
+                    "HostOnly": false,
+                    "Action": "AddMail Current blueberry.DesertBus_10km",
+                    "Actions": null,
+                    "MarkActionApplied": true
+                },
+                "blueberry.DesertBus_100km": {
+                    "Id": "blueberry.DesertBus_100km",
+                    "Trigger": "DayEnding",
+                    "Condition": "PLAYER_STAT Current Mods/blueberry.DesertBus.Distance 100000",
+                    "SkipPermanentlyCondition": null,
+                    "HostOnly": false,
+                    "Action": "AddMail Current blueberry.DesertBus_100km",
+                    "Actions": null,
+                    "MarkActionApplied": true
+                },
+                "blueberry.DesertBus_1000km": {
+                    "Id": "blueberry.DesertBus_1000km",
+                    "Trigger": "DayEnding",
+                    "Condition": "PLAYER_STAT Current Mods/blueberry.DesertBus.Distance 1000000",
+                    "SkipPermanentlyCondition": null,
+                    "HostOnly": false,
+                    "Action": "AddMail Current blueberry.DesertBus_1000km",
+                    "Actions": null,
+                    "MarkActionApplied": true
+                }
+            }
+        }
+    ]
+}

@@ -3,6 +3,10 @@
     "Changes": [
         {
             "Action": "Include",
+            "FromFile": "assets/base.json"
+        },
+        {
+            "Action": "Include",
             "FromFile": "assets/game.json"
         },
         {
