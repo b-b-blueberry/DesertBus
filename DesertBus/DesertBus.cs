@@ -74,6 +74,13 @@ public class GameState
     public double Distance;
 }
 
+public class GameResult
+{
+    public bool Success;
+    public bool Failure;
+    public GameState State;
+}
+
 public class Game : IMinigame
 {
     public ICue StartNoise;
@@ -138,7 +145,7 @@ public class Game : IMinigame
     public bool Success => this.Rules.Distance > 0 && this.State.Distance >= this.Rules.Distance;
     public bool Failure => this.Speed <= 0 && this.FailTimer >= this.Rules.FailTime;
 
-    public delegate void OnEndDelegate(bool success);
+    public delegate void OnEndDelegate(GameResult result);
 
     public event OnEndDelegate OnEnd;
 
@@ -283,7 +290,12 @@ public class Game : IMinigame
     {
         this.unload();
 
-        this.OnEnd?.Invoke(this.Success);
+        this.OnEnd?.Invoke(new()
+        {
+            Success = this.Success,
+            Failure = this.Failure,
+            State = this.State
+        });
 
         Game1.globalFadeToClear();
 

@@ -76,13 +76,13 @@ public class ModEntry : Mod
         if (ModEntry.Config.BusTravel && e.OldLocation != e.NewLocation)
         {
             Character driver = ModEntry.IsPamDriving(e.OldLocation) ? ModEntry.Pam : Game1.player;
-            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, driver: driver, onEnd: success =>
+            ModEntry.TryStartGame(from: e.OldLocation.Name, to: e.NewLocation.Name, driver: driver, onEnd: result =>
             {
-                if (success)
+                if (result.Success)
                 {
                     // you get nothing
                 }
-                else if (ModEntry.Config.PassOut)
+                else if (result.Failure && ModEntry.Config.PassOut)
                 {
                     // then perish
                     Farmer.passOutFromTired(Game1.player);
@@ -211,12 +211,12 @@ public static class HarmonyPatches
         // go on. get your precious hearts. i'll wait
         if (ModEntry.Config.AbigailGame && Game1.currentMinigame is AbigailGame)
         {
-            ModEntry.TryStartGame(from: null, to: null, driver: ModEntry.Abigail, defaultRules: true, logoTimer: 3000, onEnd: success =>
+            ModEntry.TryStartGame(from: null, to: null, driver: ModEntry.Abigail, defaultRules: true, logoTimer: 3000, onEnd: result =>
             {
                 if (Game1.currentLocation.currentEvent is Event e)
                 {
                     e.CurrentCommand++;
-                    if (success)
+                    if (result.Success)
                     {
                         e.specialEventVariable1 = true;
                     }
