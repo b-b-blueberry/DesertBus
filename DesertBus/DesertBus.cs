@@ -130,6 +130,8 @@ public class Game : IMinigame
     public int Fade;
     public bool Quit;
 
+    public double RollingDistanceIncrementForStats;
+
     public bool IsLogoUp => this.LogoTimer > -1000;
     public bool AllowInput => !(this.IsLogoUp || this.Failure);
     public bool CanEnd => this.Success || this.Failure;
@@ -238,6 +240,20 @@ public class Game : IMinigame
         this.View = new(position.ToPoint(), size.ToPoint());
     }
 
+    public void IncrementStats(double previousDistance)
+    {
+        // take increment as chunk
+        const uint increment = 1000;
+        double difference = this.State.Distance - previousDistance;
+        this.RollingDistanceIncrementForStats += Math.Max(0, difference);
+        if (this.RollingDistanceIncrementForStats >= increment)
+        {
+            // update player stats
+            Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Distance", increment);
+            this.RollingDistanceIncrementForStats -= increment;
+        }
+    }
+
     public void EndGameAndQuit()
     {
         this.unload();
@@ -247,7 +263,7 @@ public class Game : IMinigame
         Game1.globalFadeToClear();
 
         // update player stats
-        Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Distance", (uint)this.State.Distance);
+        Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Distance", (uint)this.RollingDistanceIncrementForStats);
         Game1.player.stats.Set($"{ModEntry.STATS_ID}_MaxDistance", Math.Max(Game1.player.stats.Get($"{ModEntry.STATS_ID}_MaxDistance"), (uint)this.State.Distance));
         if (this.Success)
         {
@@ -874,6 +890,7 @@ public class Game : IMinigame
         long ticks = time.TotalGameTime.Ticks;
         double ms = time.ElapsedGameTime.TotalMilliseconds;
         double speed = this.Speed;
+        double distance = this.State.Distance;
         bool isOffRoad = this.Rules.Width > 0 && Math.Abs(this.State.Position) > this.Rules.Width / 2;
         bool isOutOfBounds = isOffRoad && Math.Abs(this.State.Position) >= this.Rules.Width;
 
@@ -1006,6 +1023,10 @@ public class Game : IMinigame
                     Game1.playSound(this.Audio.BugSplat);
                 this.BugSplat = (float)Math.Clamp(this.BugSplat + 1d / ms, 0, 5);
             }
+        }
+        // stats
+        {
+            this.IncrementStats(distance);
         }
         // lose condition
         {
