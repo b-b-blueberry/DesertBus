@@ -11,6 +11,21 @@
             "Entries": {
                 "Game_Driver": "YOUR DRIVER IS"
             }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Strings/UI",
+            "Entries": {
+                "Chat_blueberry.DesertBus_Success_Location": "{0} has reached the {2} after driving {1} meters!",
+                "Chat_blueberry.DesertBus_Success": "{0} has finished a bus trip after driving {1} meters!",
+                "Chat_blueberry.DesertBus_Failure": "{0} has crashed the bus after driving {1} meters...",
+                "Chat_blueberry.DesertBus_Quit": "{0} gave up on driving the bus after {1} meters.",
+
+                "Chat_blueberry.DesertBus_Distance_1km": "{0} has driven the bus 1,000 meters.",
+                "Chat_blueberry.DesertBus_Distance_10km": "{0} has driven the bus 10,000 meters.",
+                "Chat_blueberry.DesertBus_Distance_100km": "{0} has driven the bus 100,000 meters.",
+                "Chat_blueberry.DesertBus_Distance_1000km": "{0} has driven the bus 1,000,000 meters!"
+            }   
         }
     ]
 }

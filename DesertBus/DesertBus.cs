@@ -248,6 +248,31 @@ public class Game : IMinigame
         this.RollingDistanceIncrementForStats += Math.Max(0, difference);
         if (this.RollingDistanceIncrementForStats >= increment)
         {
+            // global chat message
+            string text = null;
+            uint distance = Game1.player.stats.Get($"{ModEntry.STATS_ID}_Distance");
+            if (distance < 1000 && distance + increment >= 1000)
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Distance_1km";
+            }
+            else if (distance < 10000 && distance + increment >= 10000)
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Distance_10km";
+            }
+            else if (distance < 100000 && distance + increment >= 100000)
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Distance_100km";
+            }
+            else if (distance < 1000000 && distance + increment >= 1000000)
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Distance_1000km";
+            }
+
+            if (text is not null)
+            {
+                Game1.Multiplayer.globalChatInfoMessageEvenInSinglePlayer(text, Game1.player.Name);
+            }
+
             // update player stats
             Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Distance", increment);
             this.RollingDistanceIncrementForStats -= increment;
@@ -273,6 +298,33 @@ public class Game : IMinigame
         {
             Game1.player.stats.Increment($"{ModEntry.STATS_ID}_Failure");
         }
+
+        // global chat message
+        string text;
+        string[] args = [Game1.player.Name, ((uint)this.State.Distance).ToString()];
+        if (this.Success)
+        {
+            GameLocation location = Game1.getLocationFromName(this.State.To);
+            if (location is not null)
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Success_Location";
+                args = [.. args, location.DisplayName];
+            }
+            else
+            {
+                text = $"{ModEntry.MESSAGE_KEY}_Success";
+            }
+        }
+        else if (this.Failure)
+        {
+            text = $"{ModEntry.MESSAGE_KEY}_Failure";
+        }
+        else
+        {
+            text = $"{ModEntry.MESSAGE_KEY}_Quit";
+        }
+
+        Game1.Multiplayer.globalChatInfoMessageEvenInSinglePlayer(text, args);
     }
 
     public void DestroyGameAfterQuit()
