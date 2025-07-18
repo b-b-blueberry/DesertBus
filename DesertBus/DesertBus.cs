@@ -733,7 +733,7 @@ public class Game : IMinigame
             SpriteFont font = Game1.smallFont;
             const int length = 9;
 
-            text = Game1.content.LoadString($"{ModEntry.STRINGS_PATH}:game.driver");
+            text = Game1.content.LoadString($"{ModEntry.STRINGS_PATH}:Game_Driver");
             textSize = font.MeasureString(text);
             textScale = scale * 0.2f;
             position = new Vector2(this.View.Left, this.View.Top) + new Vector2(91, 12) * scale;

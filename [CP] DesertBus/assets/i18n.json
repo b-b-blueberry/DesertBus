@@ -1,4 +1,16 @@
 {
-    // game
-    "game.driver": "YOUR DRIVER IS"
+    "Changes": [
+        {
+            "Action": "Load",
+            "Target": "Mods/blueberry.DesertBus/I18n",
+            "FromFile": "assets/blank.json"
+        },
+        {
+            "Action": "EditData",
+            "Target": "Mods/blueberry.DesertBus/I18n",
+            "Entries": {
+                "Game_Driver": "YOUR DRIVER IS"
+            }
+        }
+    ]
 }
