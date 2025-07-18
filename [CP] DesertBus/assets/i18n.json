@@ -23,6 +23,7 @@
                 "Item_Keys_Name": "Keys to the Bus",
                 "Item_Keys_Description": "Keys to the Josie-Jameson Starliner(tm) parked at the Bus Stop.\nBus rides are free.",
 
+                "UI_PassOut": "Your bus was eventually towed back to Stardew Valley.",
                 "UI_Keys_Mail": "Added Keys to the Bus to your = Special Items. The bus can now be used anytime for free."
             }
         },

@@ -4,6 +4,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Delegates;
+using StardewValley.Events;
 using StardewValley.GameData.Powers;
 using StardewValley.Locations;
 using StardewValley.Menus;
@@ -22,6 +23,7 @@ public class ModConfig
 public class ModState
 {
     public Game Game { get; set; }
+    public bool PassOut { get; set; }
 }
 
 public class ModEntry : Mod
@@ -51,6 +53,7 @@ public class ModEntry : Mod
         ModEntry.Config = helper.ReadConfig<ModConfig>();
 
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
+        helper.Events.GameLoop.DayStarted += this.OnDayStarted;
         helper.Events.Player.Warped += this.OnWarped;
         helper.Events.Content.AssetRequested += this.TrySortPowers;
 
@@ -61,6 +64,11 @@ public class ModEntry : Mod
         // evil doings
         Harmony harmony = new(id: this.Helper.ModRegistry.ModID);
         harmony.PatchAll();
+    }
+
+    private void OnDayStarted(object sender, DayStartedEventArgs e)
+    {
+        ModEntry.State.Value.PassOut = false;
     }
 
     public void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -85,6 +93,7 @@ public class ModEntry : Mod
                 else if (result.Failure && ModEntry.Config.PassOut)
                 {
                     // then perish
+                    ModEntry.State.Value.PassOut = true;
                     Farmer.passOutFromTired(Game1.player);
                 }
                 else
@@ -181,9 +190,38 @@ public class ModEntry : Mod
     }
 }
 
+public class GameFailedNightEvent : SoundInTheNightEvent
+{
+    public GameFailedNightEvent() : base(-1) {}
+
+    public override bool setUp()
+    {
+        base.setUp();
+
+        ModEntry.Instance.Helper.Reflection.GetField<string>(this, "soundName").SetValue("busDriveOff");
+        ModEntry.Instance.Helper.Reflection.GetField<string>(this, "message").SetValue(Game1.content.LoadString($"{ModEntry.STRINGS_PATH}:UI_PassOut"));
+
+        return false;
+    }
+}
+
 [HarmonyPatch]
 public static class HarmonyPatches
 {
+    // pass out on game failure
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Utility))]
+    [HarmonyPatch(nameof(Utility.pickPersonalFarmEvent))]
+    public static bool Utility_PickPersonalFarmEvent_Prefix(ref FarmEvent __result)
+    {
+        if (ModEntry.State.Value.PassOut)
+        {
+            __result = new GameFailedNightEvent();
+            return false;
+        }
+        return true;
+    }
+
     // arcade game
     [HarmonyPrefix]
     [HarmonyPatch(typeof(GameLocation))]
