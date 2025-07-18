@@ -28,6 +28,7 @@ public class ModEntry : Mod
 
     public static string MINIGAME_ID => $"Mods/{ModEntry.Instance.ModManifest.UniqueID}.Game";
     public static string STATS_ID => $"Mods/{ModEntry.Instance.ModManifest.UniqueID}";
+    public static string ASSETS_PATH => $"Mods/{ModEntry.Instance.ModManifest.UniqueID}";
     public static string STRINGS_PATH => $"Mods/{ModEntry.Instance.ModManifest.UniqueID}/I18n";
 
     public static ModEntry Instance { get; private set; }
@@ -117,7 +118,7 @@ public class ModEntry : Mod
 
         GameLocation location = Game1.getLocationFromName(from) ?? Game1.currentLocation;
         GameStateQueryContext context = new(location, Game1.player, null, null, Game1.random);
-        GameData data = ModEntry.Instance.Helper.GameContent.Load<GameData>("Mods/blueberry.DesertBus/Game/Data");
+        GameData data = ModEntry.Instance.Helper.GameContent.Load<GameData>($"{ModEntry.ASSETS_PATH}/Game/Data");
         GameAudio audio = data.Audio.FirstOrDefault(rules => GameStateQuery.CheckConditions(rules.Condition, context));
         GameAppearance appearance = data.Appearances.FirstOrDefault(rules => GameStateQuery.CheckConditions(rules.Condition, context));
         GameRules rules = defaultRules ? data.Rules.FirstOrDefault() : data.Rules.FirstOrDefault(rules => rules.From == from && rules.To == to && GameStateQuery.CheckConditions(rules.Condition, context));
